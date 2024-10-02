@@ -4,19 +4,24 @@ description = "A tool for downloading BARRA version 2 (BARRA2) atmospheric reana
 version = "0.1.0"
 license = "CC-BY-4.0"
 
-authors = []
+authors = ["akarich73 <61820266+akarich73@users.noreply.github.com>",]
 
 readme = "README.md"
 
 repository = "https://github.com/akarich73/barra2-dl"
 
-keywords = []
+keywords = ["downloader","barra2","atmospheric","reanlysis","wind"]
 
 classifiers = [
-  "Development Status :: 3 - Alpha",
-  "Intended Audience :: Developers",
-  "Operating System :: OS Independent",
+  "Development Status :: 1 - Planning",
+  "Intended Audience :: Science/Research",
+  "License :: Creative Commons Attribution 4.0 International",
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
   "Topic :: Software Development :: Libraries :: Python Modules",
+  "Operating System :: OS Independent",
 ]
 
 [tool.poetry.dependencies]
