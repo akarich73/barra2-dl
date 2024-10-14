@@ -26,6 +26,9 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
+pandas = "^2.2.3"
+pathlib = "^1.0.1"
+requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8"
