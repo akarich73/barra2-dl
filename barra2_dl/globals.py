@@ -49,7 +49,7 @@ barra2_aus11_csv_url = ("https://thredds.nci.org.au/thredds/ncss/grid/ob53/outpu
                         "{var}_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_{year}{month:02d}-{year}{month:02d}.nc")
 
 # index for barra2 used to join separate files
-barra2_aus11__index = ['time', 'station', 'latitude[unit="degrees_north"]', 'longitude[unit="degrees_east"]']
+barra2_aus11_index = ['time', 'station', 'latitude[unit="degrees_north"]', 'longitude[unit="degrees_east"]']
 
 # BARRA2 wind speed variable pairs
 barra2_aus11_wind_all = [('ua10m', 'va10m', '10m[unit="m s-1"]'),

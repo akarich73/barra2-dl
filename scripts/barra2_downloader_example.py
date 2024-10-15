@@ -4,9 +4,9 @@ Example for using barra2-dl to download files
 
 import barra2_dl
 from datetime import datetime
-from barra2_dl.globals import barra2_aus11_csv_url, barra2_var_wind_all, barra2_var_wind_50m, barra2_index
+from barra2_dl.globals import barra2_aus11_csv_url, barra2_aus11_wind_all, barra2_var_wind_50m, barra2_aus11_index
 
-# relative directory for caching downloaded files
+# set directory for caching downloaded files
 cache_dir = r'scripts\cache'
 output_dir = r'scripts\output'
 

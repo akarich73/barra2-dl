@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import calendar
 from .helpers import list_months
-from .globals import LatLonPoint, LatLonBBox, barra2_index
+from .globals import LatLonPoint, LatLonBBox, barra2_aus11_index
 
 
 def download_file(url: str,

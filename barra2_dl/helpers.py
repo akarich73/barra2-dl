@@ -238,7 +238,19 @@ def process_csvs:
 
 
 # todo add tests
-def calculate_wind_speed(ua: Union[float, int, List[float], List[int]], va: Union[float, int, List[float], List[int]]) -> Union[float, List[float]]:
+def calculate_wind_speed(u: Union[float, int], v: Union[float, int]) -> float:
+    """
+    Args:
+        u: The u component of the wind vector, which can be a float or an int.
+        v: The v component of the wind vector, which can be a float or an int.
+    Returns:
+        Wind speed. If both u and v are zero, it returns 0.0.
+    """
+    if u == 0 and v == 0:
+        return 0.0
+    return np.sqrt(u ** 2 + v ** 2)
+
+def wind_components_to_speed(ua: Union[float, int, List[float], List[int]], va: Union[float, int, List[float], List[int]]) -> Union[float, List[float]]:
     """
     Convert wind components ua and va to wind speed v.
     Args:
@@ -252,19 +264,31 @@ def calculate_wind_speed(ua: Union[float, int, List[float], List[int]], va: Unio
     if isinstance(ua, (float, int)) and isinstance(va, (float, int)):
         if ua == 0 and va == 0:
             return 0.0
-        return np.sqrt(ua ** 2 + va ** 2)
+        return calculate_wind_speed(ua, va)
     elif isinstance(ua, list) and isinstance(va, list):
         if not all(isinstance(num, (float, int)) for num in ua + va):
             raise ValueError("All elements in both lists must be either float or int.")
         if len(ua) != len(va):
             raise ValueError("Both lists must be of the same length.")
-        return [0.0 if u == 0 and v == 0 else np.sqrt(u ** 2 + v ** 2) for u, v in zip(ua, va)]
+        return [calculate_wind_speed(u, v) for u, v in zip(ua, va)]
     else:
         raise ValueError("Both arguments must be either both float/int or both lists of float/int.")
 
 
 # todo add tests
-def calculate_wind_direction(ua: Union[float, int, List[float], List[int]], va: Union[float, int, List[float], List[int]]) -> Union[float, List[float]]:
+def calculate_wind_direction(u: Union[float, int], v: Union[float, int]) -> float:
+    """
+    Args:
+        u: The u component of the wind vector, which can be a float or an int.
+        v: The v component of the wind vector, which can be a float or an int.
+    Returns:
+        Wind direction in degrees. If both u and v are zero, it returns 0.0.
+    """
+    if u == 0 and v == 0:
+        return 0.0
+    return np.mod(180 + np.rad2deg(np.arctan2(u, v)), 360)
+
+def wind_components_to_direction(ua: Union[float, int, List[float], List[int]], va: Union[float, int, List[float], List[int]]) -> Union[float, List[float]]:
     """
     Convert wind components ua and va to wind direction phi.
     Args:
@@ -277,15 +301,13 @@ def calculate_wind_direction(ua: Union[float, int, List[float], List[int]], va: 
     """
 
     if isinstance(ua, (float, int)) and isinstance(va, (float, int)):
-        if ua == 0 and va == 0:
-            return 0.0
-        return np.mod(180 + np.rad2deg(np.arctan2(ua, va)), 360)
+        return calculate_wind_direction(ua, va)
     elif isinstance(ua, list) and isinstance(va, list):
         if not all(isinstance(num, (float, int)) for num in ua + va):
             raise ValueError("All elements in both lists must be either float or int.")
         if len(ua) != len(va):
             raise ValueError("Both lists must be of the same length.")
-        return [0.0 if u == 0 and v == 0 else np.mod(180 + np.rad2deg(np.arctan2(u, v)), 360) for u, v in zip(ua, va)]
+        return [calculate_wind_direction(u, v) for u, v in zip(ua, va)]
     else:
         raise ValueError("Both arguments must be either both float/int or both lists of float/int.")
 
