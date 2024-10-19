@@ -1,6 +1,6 @@
 import pytest
 
-from barra2_dl import downloaders
+from barra2_dl import downloader
 from barra2_dl.globals import *
 
 @pytest.mark.parametrize(('first', 'second', 'expected'), [

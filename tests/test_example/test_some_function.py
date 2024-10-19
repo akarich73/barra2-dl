@@ -1,5 +1,4 @@
 import pytest
-
 from barra2_dl.example import some_function
 
 

@@ -21,8 +21,8 @@ lat_lon_point = dict(lat=-23.5527472, lon=133.3961111)
 start_datetime = datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
 end_datetime = datetime.strptime("2023-03-31T23:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
 
-# set output file custom name prefix to indicate a device or project location for the downloaded data
-output_filename_prefix = "test"
+# Option to set output file custom name prefix to indicate a device or project location for the downloaded data
+output_filename_prefix = "demo"
 
 
 # -----------------------------------------------------------------------------

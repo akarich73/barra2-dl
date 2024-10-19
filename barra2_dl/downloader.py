@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import calendar
 from .helpers import list_months
+from .helpers_geo import format_lat_lon
 from .globals import LatLonPoint, LatLonBBox, barra2_aus11_index
 
 
@@ -52,7 +53,7 @@ def barra2_point_downloader(base_url: str,
                             lat_lon_point: LatLonPoint,
                             start_datetime: str | datetime,
                             end_datetime: str | datetime,
-                            fileout_prefix: str,
+                            fileout_prefix: str = None,
                             fileout_folder: str = 'cache',
                             fileout_type: str = 'csv_file') -> None:
     """Download barra2 data based on the url and variables list
@@ -76,10 +77,11 @@ def barra2_point_downloader(base_url: str,
         Change from using os to pathlib
 
     """
+    # set default fileout_prefix if not set by user
 
     # loop through each variable requested for download as each variable is saved in a separate url
     for var in barra2_var:
-        # loop through each month as each BARRA2 file is saved by month
+        # loop through each month as each BARRA2 file is saved by month todo check index enumerate addition works
         for date in list_months(start_datetime, end_datetime, freq="MS"):
             year = date.year
             month = date.month
@@ -97,8 +99,12 @@ def barra2_point_downloader(base_url: str,
             folder_path = fileout_folder
             download_file(url, folder_path, fileout_name, create_folder=True)
 
-    return
+            # todo add option to name file_prefix using BARRA2 node; might need index 0 check
+            # if fileout_prefix is None:
+            #   fileout_prefix = BARRA2_aus11_index[lat_lon_point['lat']][lat_lon_point['lon']]
 
+
+    return
 
 
 

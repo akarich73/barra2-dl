@@ -1,1 +1,1 @@
-from . import globals, helpers, downloaders
+from . import globals, downloader, merger, helpers
