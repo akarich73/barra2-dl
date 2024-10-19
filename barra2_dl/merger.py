@@ -1,5 +1,5 @@
 """
-Helper functions for csv files.
+This module contains the barra2 merge function(s).
 """
 from pathlib import Path
 import pandas as pd
@@ -33,41 +33,6 @@ def filter_list_using_wildcard(input_list: list[str], pattern:str):
     """
     filtered_list = fnmatch.filter(input_list, pattern)
     return filtered_list
-
-
-def export_df_to_csv(dataframe: pd.DataFrame,
-                            fileout_folder: str | Path,
-                            fileout_name: str,
-                            create_folder: bool = True) -> None:
-    """
-    Export a DataFrame to a CSV file in the specified folder with the given file name.
-
-    Args:
-        dataframe (pd.DataFrame): The Pandas DataFrame to export.
-        fileout_folder (str or Path): The path to the folder where the CSV file will be saved.
-        fileout_name (str): The name of the CSV file to save.
-        create_folder (bool): If True, creates the folder if it does not exist; otherwise, exits if the folder doesn't exist.
-
-    Returns:
-        Path: The path of the saved CSV file.
-    """
-    fileout_folder = Path(fileout_folder)
-    # Check if the folder exists
-    if not fileout_folder.exists():
-        if create_folder:
-            fileout_folder.mkdir(parents=True)
-            print(f"The folder '{fileout_folder}' was created.")
-        else:
-            print(f"The folder '{fileout_folder}' does not exist. Exiting...")
-            return
-
-    # Define the full path for the CSV file
-    fileout_path_name = fileout_folder / fileout_name
-
-    # Export the DataFrame to CSV
-    dataframe.to_csv(fileout_path_name, index=False)
-
-    return fileout_path_name
 
 
 def merge_csvs_to_df(filein_folder: str,
@@ -133,3 +98,83 @@ def merge_csvs_to_df(filein_folder: str,
             df_combined = merge_suffix_columns(df_combined)
 
     return df_combined
+
+
+
+# # todo draft function to process csvs
+# def process_csvs:
+#       # process barra2 variables to wind speed and direction todo split into modules
+#
+#     # initiate DataFrame for adding new columns
+#     df_processed = df_combined
+#
+#     # loop through df_combined to df_processed
+#     for tup in barra2_wind_speeds:
+#         mask_wind_speed_h = tup[0][2:]
+#         mask_ua = df_combined.columns.str.contains(tup[0])  # selects column header
+#         mask_va = df_combined.columns.str.contains(tup[1])  # selects column header
+#
+#         if np.any(mask_ua == True) and np.any(mask_va == True):
+#             df_processed_ua = df_combined.loc[:, mask_ua]  # selects mask
+#             df_processed_va = df_combined.loc[:, mask_va]  # selects mask
+#
+#             print('Converted: ' + tup.__str__())
+#
+#             df_processed_v = pd.DataFrame(np.sqrt(df_processed_ua.iloc[:, 0] ** 2 + df_processed_va.iloc[:, 0] ** 2))
+#             df_processed_v.columns = ['v' + mask_wind_speed_h + '[unit="m s-1"]']
+#
+#             df_processed_phi_met = pd.DataFrame()
+#
+#             for index, row in df_combined.iterrows():
+#                 if (df_processed_ua.iloc[index, 0] == 0) and (df_processed_va.iloc[index, 0] == 0):
+#                     df_processed_phi_met.loc[index, 'v' + mask_wind_speed_h + '_' + 'phi_met[unit="degrees"]'] = 0.0
+#                 else:
+#                     df_processed_phi_met.loc[index, 'v' + mask_wind_speed_h + '_' + 'phi_met[unit="degrees"]'] = (
+#                         np.mod(180 + np.rad2deg(
+#                             np.arctan2(df_processed_ua.iloc[index, 0], df_processed_va.iloc[index, 0])), 360))
+#
+#             # Merge the current variable DataFrame with the combined DataFrame
+#             df_processed = df_processed.join(df_processed_v)
+#             df_processed = df_processed.join(df_processed_phi_met)
+#
+#     # export combined to csv
+#     df_processed.to_csv(
+#         os.path.join(output_dir,
+#                      f"{output_filename_prefix}_processed_{start_date_time.strftime("%Y%m%d")}_{end_date_time.strftime("%Y%m%d")}.csv"))
+#
+#     return
+
+
+def export_df_to_csv(dataframe: pd.DataFrame,
+                            fileout_folder: str | Path,
+                            fileout_name: str,
+                            create_folder: bool = True) -> None:
+    """
+    Export a DataFrame to a CSV file in the specified folder with the given file name.
+
+    Args:
+        dataframe (pd.DataFrame): The Pandas DataFrame to export.
+        fileout_folder (str or Path): The path to the folder where the CSV file will be saved.
+        fileout_name (str): The name of the CSV file to save.
+        create_folder (bool): If True, creates the folder if it does not exist; otherwise, exits if the folder doesn't exist.
+
+    Returns:
+        Path: The path of the saved CSV file.
+    """
+    fileout_folder = Path(fileout_folder)
+    # Check if the folder exists
+    if not fileout_folder.exists():
+        if create_folder:
+            fileout_folder.mkdir(parents=True)
+            print(f"The folder '{fileout_folder}' was created.")
+        else:
+            print(f"The folder '{fileout_folder}' does not exist. Exiting...")
+            return
+
+    # Define the full path for the CSV file
+    fileout_path_name = fileout_folder / fileout_name
+
+    # Export the DataFrame to CSV
+    dataframe.to_csv(fileout_path_name, index=False)
+
+    return fileout_path_name
