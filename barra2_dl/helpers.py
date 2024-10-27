@@ -2,7 +2,6 @@
 General helper functions for barra2-dl.
 """
 
-from pathlib import Path
 import pandas as pd
 from typing import List, Union
 

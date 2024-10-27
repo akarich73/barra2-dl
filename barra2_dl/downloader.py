@@ -2,12 +2,13 @@
 This module contains the barra2 download function(s) .
 """
 import requests
+
 from datetime import datetime, timedelta
 from pathlib import Path
 import calendar
-from .helpers import list_months
-from .helpers_geo import format_lat_lon
-from .globals import LatLonPoint, LatLonBBox, barra2_aus11_index
+
+from barra2_dl.helpers import list_months
+from barra2_dl.globals import LatLonPoint
 
 
 def download_file(url: str,
@@ -85,17 +86,20 @@ def barra2_point_downloader(base_url: str,
         for date in list_months(start_datetime, end_datetime, freq="MS"):
             year = date.year
             month = date.month
-            time_start = date.isoformat() + 'Z'
+            time_start = date
+            time_start_str = date.isoformat() + 'Z'
             # Get the number of days in the current month
             days_in_month = calendar.monthrange(year, month)[1]
-            time_end = (date + timedelta(days=days_in_month) + timedelta(hours=-1)).isoformat() + 'Z'
+            time_end = date + timedelta(days=days_in_month) + timedelta(hours=-1)
+            time_end_str = time_end.isoformat() + 'Z'
 
             # update thredds_base_url and set as url for request
             url = base_url.format(var=var, year=year, month=month)
 
             # add url parameters to base_url
-            url += f"?var={var}&latitude={lat_lon_point['lat']}&longitude={lat_lon_point['lon']}&time_start={time_start}&time_end={time_end}&accept={fileout_type}"
-            fileout_name = f'{fileout_prefix}_{var}_{time_start[:10]}_{time_end[:10]}.csv'
+            url += (f"?var={var}&latitude={lat_lon_point['lat']}&longitude={lat_lon_point['lon']}&time_start={time_start_str}&time_end={time_end_str}&accept"
+                    f"={fileout_type}")
+            fileout_name = f'{fileout_prefix}_{var}_{time_start.strftime('%Y%m%d')}_{time_end.strftime('%Y%m%d')}.csv'
             folder_path = fileout_folder
             download_file(url, folder_path, fileout_name, create_folder=True)
 

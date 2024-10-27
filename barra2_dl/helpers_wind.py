@@ -49,6 +49,8 @@ def wind_components_to_speed(ua: float | int | list[float | int], va: float | in
 # todo add tests
 def calculate_wind_direction(u: float | int, v: float | int) -> float:
     """
+    Calculate angular wind direction.
+
     Args:
         u (float | int): The u component of the wind vector, which can be a float or an int.
         v (float | int): The v component of the wind vector, which can be a float or an int.
@@ -63,6 +65,7 @@ def calculate_wind_direction(u: float | int, v: float | int) -> float:
 def wind_components_to_direction(ua: float | int | List[float | int], va: float | int | List[float | int]) -> float | List[float]:
     """
     Convert wind components ua and va to wind direction phi.
+
     Args:
         ua (float | int | List[float | int]): The u-component of the wind.
         va (float | int | List[float | int]): The v-component of the wind.

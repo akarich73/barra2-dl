@@ -1,10 +1,14 @@
 """
 This module contains the barra2 merge function(s).
 """
-from pathlib import Path
 import pandas as pd
-import fnmatch
+import numpy as np
 
+import fnmatch
+from pathlib import Path
+
+import barra2_dl.helpers_wind as helpers_wind
+from barra2_dl.globals import barra2_aus11_wind_all
 
 def list_csv_files(folder_path):
     """
@@ -35,6 +39,34 @@ def filter_list_using_wildcard(input_list: list[str], pattern:str):
     return filtered_list
 
 
+def merge_suffix_columns(df: pd.DataFrame, suffix_x: str = '_x', suffix_y: str = '_y') -> pd.DataFrame:
+    """
+    Function to merge DataFrame columns with '_x' and '_y' suffixes.
+
+    Args:
+        df: The DataFrame that contains columns with suffixes to be merged.
+        suffix_x: The suffix used in the first set of columns (default is '_x').
+        suffix_y: The suffix used in the second set of columns (default is '_y').
+
+    Returns:
+        DataFrame: A DataFrame with the merged columns.
+        If no suffix_x returns the original DataFrame.
+
+    Todo:
+        Add checks for multiple and mismatched suffixed columns
+    """
+    for column in df.columns:
+        if column.endswith(suffix_x):
+            base_column = column[:-len(suffix_x)]
+            column_y = base_column + suffix_y
+            if column_y in df.columns:
+                # Create a new column without suffix and merge the values
+                df[base_column] = df[column].combine_first(df[column_y])
+                # Drop the old suffix columns
+                df.drop([column, column_y], axis=1, inplace=True)
+    return df
+
+
 def merge_csvs_to_df(filein_folder: str,
                     filename_pattern: str = '*.csv',
                     index_for_join: str = None) -> pd.DataFrame:
@@ -54,34 +86,7 @@ def merge_csvs_to_df(filein_folder: str,
         add .csv check for filename_prefix
     """
 
-    def merge_suffix_columns(df: pd.DataFrame, suffix_x: str = '_x', suffix_y: str = '_y') -> pd.DataFrame:
-        """
-        Function to merge DataFrame columns with '_x' and '_y' suffixes.
-
-        Args:
-            df: The DataFrame that contains columns with suffixes to be merged.
-            suffix_x: The suffix used in the first set of columns (default is '_x').
-            suffix_y: The suffix used in the second set of columns (default is '_y').
-
-        Returns:
-            DataFrame: A DataFrame with the merged columns.
-            If no suffix_x returns the original DataFrame.
-
-        Todo:
-            Add checks for multiple and mismatched suffixed columns
-        """
-        for column in df.columns:
-            if column.endswith(suffix_x):
-                base_column = column[:-len(suffix_x)]
-                column_y = base_column + suffix_y
-                if column_y in df.columns:
-                    # Create a new column without suffix and merge the values
-                    df[base_column] = df[column].combine_first(df[column_y])
-                    # Drop the old suffix columns
-                    df.drop([column, column_y], axis=1, inplace=True)
-        return df
-
-    # initiate dataframe for combined csv results
+    # instantiate dataframe for combined csv results
     df_combined = pd.DataFrame()
 
     for file in Path(filein_folder).glob(filename_pattern):
@@ -92,57 +97,54 @@ def merge_csvs_to_df(filein_folder: str,
         else:
             # read next file into new df
             df_add = pd.read_csv(file)
-            # combine on index join if not None, otherwise just concat together
-            # todo df_combined = df1.merge(df2,how='outer') seems to guess the matching columns
             df_combined = pd.merge(df_combined, df_add, how='outer', on=index_for_join)
             df_combined = merge_suffix_columns(df_combined)
 
     return df_combined
 
 
+def convert_wind_components(df_merged: pd.DataFrame) -> pd.DataFrame:
+    """
+    A template for a new function.
 
-# # todo draft function to process csvs
-# def process_csvs:
-#       # process barra2 variables to wind speed and direction todo split into modules
-#
-#     # initiate DataFrame for adding new columns
-#     df_processed = df_combined
-#
-#     # loop through df_combined to df_processed
-#     for tup in barra2_wind_speeds:
-#         mask_wind_speed_h = tup[0][2:]
-#         mask_ua = df_combined.columns.str.contains(tup[0])  # selects column header
-#         mask_va = df_combined.columns.str.contains(tup[1])  # selects column header
-#
-#         if np.any(mask_ua == True) and np.any(mask_va == True):
-#             df_processed_ua = df_combined.loc[:, mask_ua]  # selects mask
-#             df_processed_va = df_combined.loc[:, mask_va]  # selects mask
-#
-#             print('Converted: ' + tup.__str__())
-#
-#             df_processed_v = pd.DataFrame(np.sqrt(df_processed_ua.iloc[:, 0] ** 2 + df_processed_va.iloc[:, 0] ** 2))
-#             df_processed_v.columns = ['v' + mask_wind_speed_h + '[unit="m s-1"]']
-#
-#             df_processed_phi_met = pd.DataFrame()
-#
-#             for index, row in df_combined.iterrows():
-#                 if (df_processed_ua.iloc[index, 0] == 0) and (df_processed_va.iloc[index, 0] == 0):
-#                     df_processed_phi_met.loc[index, 'v' + mask_wind_speed_h + '_' + 'phi_met[unit="degrees"]'] = 0.0
-#                 else:
-#                     df_processed_phi_met.loc[index, 'v' + mask_wind_speed_h + '_' + 'phi_met[unit="degrees"]'] = (
-#                         np.mod(180 + np.rad2deg(
-#                             np.arctan2(df_processed_ua.iloc[index, 0], df_processed_va.iloc[index, 0])), 360))
-#
-#             # Merge the current variable DataFrame with the combined DataFrame
-#             df_processed = df_processed.join(df_processed_v)
-#             df_processed = df_processed.join(df_processed_phi_met)
-#
-#     # export combined to csv
-#     df_processed.to_csv(
-#         os.path.join(output_dir,
-#                      f"{output_filename_prefix}_processed_{start_date_time.strftime("%Y%m%d")}_{end_date_time.strftime("%Y%m%d")}.csv"))
-#
-#     return
+    Args:
+        df_combined: Dataframe with wind data ua and va columnes to convert to v and phi
+
+    Returns:
+        return_type: Dataframe.
+
+    Example:
+        >>> result = new_function_template(value1, value2)
+        >>> print(result)
+    """
+    # loop through all possible wind components
+    for tup in barra2_aus11_wind_all:
+        mask_wind_speed_h = tup[0][2:]
+        mask_ua = df_merged.columns.str.contains(tup[0])  # select the ua column header
+        mask_va = df_merged.columns.str.contains(tup[1])  # select the va column header
+
+        if np.any(mask_ua == True) and np.any(mask_va == True):
+            # create temporary dataframe for ua and va using the mask
+            df_merged_ua = df_merged.loc[:, mask_ua]
+            df_merged_va = df_merged.loc[:, mask_va]
+
+            print('Converting: ' + df_merged_ua.columns.values[0] + ', ' + df_merged_va.columns.values[0])
+
+            #df_processed_v = pd.DataFrame(np.sqrt(df_processed_ua.iloc[:, 0] ** 2 + df_processed_va.iloc[:, 0] ** 2))
+            df_processed_v = pd.DataFrame(
+                helpers_wind.wind_components_to_speed(df_merged_ua.iloc[:, 0].tolist(),df_merged_va.iloc[:, 0].tolist()),
+                columns = ['v' + mask_wind_speed_h + '[unit="m s-1"]'])
+
+            # instantiate a temp dataframe for the phi value
+            df_processed_phi_met = pd.DataFrame(
+                helpers_wind.wind_components_to_direction(df_merged_ua.iloc[:, 0].tolist(),df_merged_va.iloc[:, 0].tolist()),
+                columns = ['v' + mask_wind_speed_h + '_' + 'phi_met[unit="degrees"]'])
+
+            # Merge the current variable DataFrame with the combined DataFrame
+            df_processed = df_merged.join(df_processed_v)
+            df_processed = df_processed.join(df_processed_phi_met)
+
+    return df_processed
 
 
 def export_df_to_csv(dataframe: pd.DataFrame,
@@ -177,4 +179,4 @@ def export_df_to_csv(dataframe: pd.DataFrame,
     # Export the DataFrame to CSV
     dataframe.to_csv(fileout_path_name, index=False)
 
-    return fileout_path_name
+    pass
