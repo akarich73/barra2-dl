@@ -3,23 +3,36 @@ General helper functions for barra2-dl.
 """
 
 import pandas as pd
-from typing import List, Union
+from typing import List
 
 
-def list_months(start_datetime: str, end_datetime: str, freq: str ='MS', **kwargs) -> list:
+import pandas as pd
+
+
+def list_months(start_datetime: str, end_datetime: str, freq: str = 'MS') -> list:
     """Generate list of months from input start and end datetime for url file loop.
 
     Args:
-        freq:
         start_datetime: str or datetime-like, Left bound for generating dates.
         end_datetime: str or datetime-like, Left bound for generating dates.
-        **kwargs:
+        freq: Frequency string representing the interval between dates (default is 'MS').
 
     Returns:
-        list
+        list: List of dates from start to end at the given frequency.
+
+    Raises:
+        ValueError: If the provided start_datetime or end_datetime are not valid datetime-like.
     """
-    df_to_list = pd.date_range(start=start_datetime, end=end_datetime, freq=freq, **kwargs).tolist()
+    try:
+        pd.to_datetime(start_datetime)
+        pd.to_datetime(end_datetime)
+    except ValueError as e:
+        raise ValueError("Invalid date(s) provided: {}".format(e))
+
+    df_to_list = pd.date_range(start=start_datetime, end=end_datetime, freq=freq).tolist()
     return df_to_list
+
+
 
 
 def get_timestamp_range_list(dataframe: pd.DataFrame, timestamp_column: str) -> List[pd.Timestamp]:

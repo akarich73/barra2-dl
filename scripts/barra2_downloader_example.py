@@ -12,7 +12,7 @@ from barra2_dl.globals import barra2_aus11_csv_url, barra2_aus11_wind_all, barra
 cache_dir = r'cache'
 output_dir = r'\output'
 
-# set location todo implement grid netCDF download
+# set location
 lat_lon_point = dict(lat=-23.5527472, lon=133.3961111)
 
 # set time ref https://stackoverflow.com/questions/17594298/date-time-formats-in-python

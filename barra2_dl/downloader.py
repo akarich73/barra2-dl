@@ -75,7 +75,7 @@ def barra2_point_downloader(base_url: str,
 
     Todo:
         Add set list of output format options
-        Change from using os to pathlib
+        Implement grid netCDF download
 
     """
     # set default fileout_prefix if not set by user
@@ -106,7 +106,6 @@ def barra2_point_downloader(base_url: str,
             # todo add option to name file_prefix using BARRA2 node; might need index 0 check
             # if fileout_prefix is None:
             #   fileout_prefix = BARRA2_aus11_index[lat_lon_point['lat']][lat_lon_point['lon']]
-
 
     return
 

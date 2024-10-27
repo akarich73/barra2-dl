@@ -1,7 +1,13 @@
+import numpy as np
 import pytest
 
 from barra2_dl import helpers_wind
 
+from barra2_dl.helpers_wind import calculate_wind_direction
+
+"""
+helpers_wind.calculate_wind_speed
+"""
 
 @pytest.mark.parametrize(('u', 'v', 'expected'), [
     (1, 1, 1.4142135623730951),
@@ -14,3 +20,78 @@ from barra2_dl import helpers_wind
 def test_calculate_wind_speed(u: float, v: float, expected: float) -> None:
     """Example test with parametrization."""
     assert helpers_wind.calculate_wind_speed(u, v) == expected
+
+"""
+helpers_wind.wind_components_to_speed
+"""
+
+@pytest.mark.parametrize("ua,va,expected", [
+    ([3, 0], [4, 0], [5, 0]),
+    ([0, 0], [0, 0], [0, 0]),
+    (0, 0, 0),
+    (3, 4, 5)
+])
+def test_wind_components_to_speed(ua, va, expected):
+    assert helpers_wind.wind_components_to_speed(ua, va) == expected
+
+
+@pytest.mark.parametrize("ua,va", [
+    ('3', 4),
+    (3, '4'),
+    (['3', 0], [4, 0]),
+    ([3, 0], ['4', 0]),
+    ([3, 0], [4]),
+    ([3, 0], 4),
+    (3, [4, 0]),
+    ('3', '4')
+])
+def test_wind_components_to_speed_exception(ua, va):
+    with pytest.raises(ValueError):
+        helpers_wind.wind_components_to_speed(ua, va)
+
+"""
+helpers_wind.calculate_wind_direction
+"""
+
+@pytest.mark.parametrize("u, v, expected", [
+    (0, 0, 0.0),  # Test when both u and v are zero
+    (1, 0, 270.0),  # Test when u is non-zero and v is zero
+    (0, 1, 180.0),  # Test when u is zero and v is non-zero
+    (1, 1, 225.0),  # Test when both u and v are positive
+    (-1, -1, 45.0),  # Test when both u and v are negative
+    (-1, 1, 135.0),  # Test when u is negative and v is positive
+    (1, -1, 315.0)  # Test when u is positive and v is negative
+])
+def test_calculate_wind_direction(u, v, expected):
+    assert np.isclose(helpers_wind.calculate_wind_direction(u, v), expected)
+
+
+"""
+helpers_wind.wind_components_to_direction
+"""
+
+# Test the function with float and integer inputs
+@pytest.mark.parametrize("ua,va", [(2.5, 3), (7, 4)])
+def test_wind_components_to_direction_float_int_input(ua, va):
+    assert isinstance(helpers_wind.wind_components_to_direction(ua, va), float)
+
+
+# Test the function with list inputs containing both integers and floats
+@pytest.mark.parametrize("ua,va", [([2, 3.5, 1], [4, 5, 1.5]), ([5, 2], [0.8, 3])])
+def test_wind_components_to_direction_list_input(ua, va):
+    assert isinstance(helpers_wind.wind_components_to_direction(ua, va), list)
+    assert all(isinstance(i, float) for i in helpers_wind.wind_components_to_direction(ua, va))
+
+
+# Test the function with mismatched list lengths
+@pytest.mark.parametrize("ua,va", [([2, 3], [4])])
+def test_wind_components_to_direction_mismatched_list_lengths(ua, va):
+    with pytest.raises(ValueError):
+        helpers_wind.wind_components_to_direction(ua, va)
+
+
+# Test the function with inputs not following the correct types
+@pytest.mark.parametrize("ua,va", [(2, [4]), ([2, '3'], [4, 5])])
+def test_wind_components_to_direction_invalid_input(ua, va):
+    with pytest.raises(ValueError):
+        helpers_wind.wind_components_to_direction(ua, va)
