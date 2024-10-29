@@ -2,41 +2,8 @@
 This module contains the barra2 merge function(s).
 """
 import pandas as pd
-import numpy as np
 
-import fnmatch
 from pathlib import Path
-
-import barra2_dl.helpers_wind as helpers_wind
-from barra2_dl.globals import barra2_aus11_wind_all
-
-def list_csv_files(folder_path):
-    """
-    List all CSV files in the given folder.
-
-    Args:
-        folder_path (str): The path to the folder containing the CSV files.
-
-    Returns:
-        list: A list of CSV file names in the folder.
-    """
-    folder = Path(folder_path)
-    csv_files = [file.name for file in folder.glob('*.csv')]
-    return csv_files
-
-def filter_list_using_wildcard(input_list: list[str], pattern:str):
-    """
-    Filter a list using a wildcard pattern.
-
-    Args:
-        input_list (list[str]): The list of strings to be filtered.
-        pattern (str): The wildcard pattern to filter the list.
-
-    Returns:
-        list: A list of strings that match the wildcard pattern.
-    """
-    filtered_list = fnmatch.filter(input_list, pattern)
-    return filtered_list
 
 
 def merge_suffix_columns(df: pd.DataFrame, suffix_x: str = '_x', suffix_y: str = '_y') -> pd.DataFrame:
@@ -101,50 +68,6 @@ def merge_csvs_to_df(filein_folder: str,
             df_combined = merge_suffix_columns(df_combined)
 
     return df_combined
-
-
-def convert_wind_components(df_merged: pd.DataFrame) -> pd.DataFrame:
-    """
-    A template for a new function.
-
-    Args:
-        df_combined: Dataframe with wind data ua and va columnes to convert to v and phi
-
-    Returns:
-        return_type: Dataframe.
-
-    Example:
-        >>> result = new_function_template(value1, value2)
-        >>> print(result)
-    """
-    # loop through all possible wind components
-    for tup in barra2_aus11_wind_all:
-        mask_wind_speed_h = tup[0][2:]
-        mask_ua = df_merged.columns.str.contains(tup[0])  # select the ua column header
-        mask_va = df_merged.columns.str.contains(tup[1])  # select the va column header
-
-        if np.any(mask_ua == True) and np.any(mask_va == True):
-            # create temporary dataframe for ua and va using the mask
-            df_merged_ua = df_merged.loc[:, mask_ua]
-            df_merged_va = df_merged.loc[:, mask_va]
-
-            print('Converting: ' + df_merged_ua.columns.values[0] + ', ' + df_merged_va.columns.values[0])
-
-            #df_processed_v = pd.DataFrame(np.sqrt(df_processed_ua.iloc[:, 0] ** 2 + df_processed_va.iloc[:, 0] ** 2))
-            df_processed_v = pd.DataFrame(
-                helpers_wind.wind_components_to_speed(df_merged_ua.iloc[:, 0].tolist(),df_merged_va.iloc[:, 0].tolist()),
-                columns = ['v' + mask_wind_speed_h + '[unit="m s-1"]'])
-
-            # instantiate a temp dataframe for the phi value
-            df_processed_phi_met = pd.DataFrame(
-                helpers_wind.wind_components_to_direction(df_merged_ua.iloc[:, 0].tolist(),df_merged_va.iloc[:, 0].tolist()),
-                columns = ['v' + mask_wind_speed_h + '_' + 'phi_met[unit="degrees"]'])
-
-            # Merge the current variable DataFrame with the combined DataFrame
-            df_processed = df_merged.join(df_processed_v)
-            df_processed = df_processed.join(df_processed_phi_met)
-
-    return df_processed
 
 
 def export_df_to_csv(dataframe: pd.DataFrame,

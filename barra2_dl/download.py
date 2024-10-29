@@ -49,14 +49,14 @@ def download_file(url: str,
     return
 
 
-def barra2_point_downloader(base_url: str,
-                            barra2_var: list,
-                            lat_lon_point: LatLonPoint,
-                            start_datetime: str | datetime,
-                            end_datetime: str | datetime,
-                            fileout_prefix: str = None,
-                            fileout_folder: str = 'cache',
-                            fileout_type: str = 'csv_file') -> None:
+def barra2_point(base_url: str,
+                 barra2_var: list,
+                 lat_lon_point: LatLonPoint,
+                 start_datetime: str | datetime,
+                 end_datetime: str | datetime,
+                 fileout_prefix: str = None,
+                 fileout_folder: str = 'cache',
+                 fileout_type: str = 'csv_file') -> None:
     """Download barra2 data based on the url and variables list
     for each month between start and end datetime.
 

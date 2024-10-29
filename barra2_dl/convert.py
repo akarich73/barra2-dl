@@ -1,10 +1,12 @@
 """
-Helper functions for wind calculations.
-# todo add tests
+This module contains the barra2 convert function(s).
 """
+import numpy as np
+import pandas as pd
 
 from typing import List
-import numpy as np
+
+from barra2_dl.globals import barra2_aus11_wind_all
 
 
 def calculate_wind_speed(u: float | int, v: float | int) -> float:
@@ -46,7 +48,6 @@ def wind_components_to_speed(ua: float | int | list[float | int], va: float | in
         raise ValueError("Both arguments must be either both float/int or both lists of float/int.")
 
 
-# todo add tests
 def calculate_wind_direction(u: float | int, v: float | int) -> float:
     """
     Calculate angular wind direction.
@@ -85,3 +86,55 @@ def wind_components_to_direction(ua: float | int | List[float | int], va: float 
         return [calculate_wind_direction(u, v) for u, v in zip(ua, va)]
     else:
         raise ValueError("Both arguments must be either both float/int or both lists of float/int.")
+
+
+def convert_wind_components(df_merged: pd.DataFrame) -> pd.DataFrame:
+    """
+    Converts columns of wind components ua* and va* to v and phi.
+
+    Args:
+        df_merged: Dataframe with wind data ua and va columns to convert to v and phi
+
+    Returns:
+        return_type: Dataframe.
+
+    Todo:
+        Update function as following leverages global variables
+    """
+    # loop through all possible wind components
+    df_processed = pd.DataFrame()
+
+    for tup in barra2_aus11_wind_all:
+        mask_wind_speed_h = tup[0][2:]
+        mask_ua = df_merged.columns.str.contains(tup[0])  # select the ua column header
+        mask_va = df_merged.columns.str.contains(tup[1])  # select the va column header
+
+        if np.any(mask_ua == True) and np.any(mask_va == True):
+            # create temporary dataframe for ua and va using the mask
+            df_merged_ua = df_merged.loc[:, mask_ua]
+            df_merged_va = df_merged.loc[:, mask_va]
+
+            print('Converting: ' + df_merged_ua.columns.values[0] + ', ' + df_merged_va.columns.values[0])
+
+            #df_processed_v = pd.DataFrame(np.sqrt(df_processed_ua.iloc[:, 0] ** 2 + df_processed_va.iloc[:, 0] ** 2))
+            df_processed_v = pd.DataFrame(
+                wind_components_to_speed(df_merged_ua.iloc[:, 0].tolist(), df_merged_va.iloc[:, 0].tolist()),
+                columns = ['v' + mask_wind_speed_h + '[unit="m s-1"]'])
+
+            # instantiate a temp dataframe for the phi value
+            df_processed_phi_met = pd.DataFrame(
+                wind_components_to_direction(df_merged_ua.iloc[:, 0].tolist(), df_merged_va.iloc[:, 0].tolist()),
+                columns = ['v' + mask_wind_speed_h + '_' + 'phi_met[unit="degrees"]'])
+
+            # Merge the current variable DataFrame with the combined DataFrame
+            df_processed = df_merged.join(df_processed_v)
+            df_processed = df_processed.join(df_processed_phi_met)
+
+    # check if df_processed was updated
+    if df_processed.empty:
+        raise ValueError("No ua or va values in the dataframe to convert.")
+    else:
+        return df_processed
+
+
+

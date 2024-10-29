@@ -6,11 +6,12 @@ from datetime import datetime
 from pathlib import Path
 
 import barra2_dl
+import barra2_dl.convert
 from barra2_dl.globals import barra2_aus11_csv_url, barra2_aus11_wind_all, barra2_var_wind_50m, barra2_aus11_index
 
 # set directory for caching downloaded files
 cache_dir = r'cache'
-output_dir = r'\output'
+output_dir = r'output'
 
 # set location
 lat_lon_point = dict(lat=-23.5527472, lon=133.3961111)
@@ -28,24 +29,24 @@ output_filename_prefix = "demo"
 # -----------------------------------------------------------------------------
 def main():
     # download from barra2_aus11
-    barra2_dl.downloader.barra2_point_downloader(barra2_aus11_csv_url,
-                                                  barra2_var_wind_50m,
-                                                  lat_lon_point,
-                                                  start_datetime,
-                                                  end_datetime,
-                                                  fileout_prefix = 'demo',
-                                                  fileout_folder=r'scripts\cache',
-                                                  )
+    barra2_dl.download.barra2_point(barra2_aus11_csv_url,
+                                      barra2_var_wind_50m,
+                                      lat_lon_point,
+                                      start_datetime,
+                                      end_datetime,
+                                      fileout_prefix = 'demo',
+                                      fileout_folder=r'cache',
+                                      )
 
     # merge downloaded csvs into a new dataframe
-    df_merged = barra2_dl.merger.merge_csvs_to_df(r"C:\Users\Richard.Gledhill\Local\PycharmProjects\barra2-dl\scripts\cache",index_for_join=barra2_aus11_index)
+    df_merged = barra2_dl.merge.merge_csvs_to_df(r"C:\Users\Richard.Gledhill\Local\PycharmProjects\barra2-dl\scripts\cache",index_for_join=barra2_aus11_index)
     # output to a new csv file
     df_merged.to_csv(
         Path(output_dir) / f"{output_filename_prefix}_merged_{start_datetime.strftime("%Y%m%d")}_{end_datetime.strftime("%Y%m%d")}.csv",
         index=False)
 
     # convert ua and va to v and phi
-    df_converted = barra2_dl.merger.convert_wind_components(df_merged)
+    df_converted = barra2_dl.convert.convert_wind_components(df_merged)
     # output to a new csv file
     df_converted.to_csv(
         Path(output_dir) / f"{output_filename_prefix}_converted_{start_datetime.strftime("%Y%m%d")}_{end_datetime.strftime("%Y%m%d")}.csv",

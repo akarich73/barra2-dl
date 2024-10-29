@@ -1,4 +1,1 @@
-from barra2_dl import downloader
-from barra2_dl import merger
-
-
+from barra2_dl import download, merge, convert

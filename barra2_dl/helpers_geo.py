@@ -15,7 +15,7 @@ def generate_point_grid(lat_lon_bbox: Union[dict, tuple], lat_res: float, lon_re
     Create a grid of longitude and latitude points between specified minimum and maximum values.
 
     Args:
-        lat_lon_bbox (Union[dict, tuple]): Dictionary or tuple containing geographic boundaries.
+        lat_lon_bbox (dict | tuple): Dictionary or tuple containing geographic boundaries.
                                      Dictionary should have keys 'north', 'south', 'east', 'west'.
                                      Tuple should contain values in the order (north, south, east, west).
         lon_res (float): Resolution of the longitude points.

@@ -3,10 +3,8 @@ General helper functions for barra2-dl.
 """
 
 import pandas as pd
+
 from typing import List
-
-
-import pandas as pd
 
 
 def list_months(start_datetime: str, end_datetime: str, freq: str = 'MS') -> list:
