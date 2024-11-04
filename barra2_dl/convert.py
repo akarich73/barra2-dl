@@ -1,10 +1,10 @@
 """
 This module contains the barra2 convert function(s).
 """
+from typing import List
+
 import numpy as np
 import pandas as pd
-
-from typing import List
 
 from barra2_dl.globals import barra2_aus11_wind_all
 

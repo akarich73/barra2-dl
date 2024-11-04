@@ -7,10 +7,10 @@ from pathlib import Path
 
 import barra2_dl
 import barra2_dl.convert
-from barra2_dl.globals import barra2_aus11_csv_url, barra2_aus11_wind_all, barra2_var_wind_50m, barra2_aus11_index
+from barra2_dl.globals import barra2_aus11_wind_all, barra2_var_wind_50m, barra2_aus11_index
 
 # set directory for caching downloaded files
-cache_dir = r'cache'
+cache_dir = r'scripts\cache'
 output_dir = r'output'
 
 # set location
@@ -29,13 +29,12 @@ output_filename_prefix = "demo"
 # -----------------------------------------------------------------------------
 def main():
     # download from barra2_aus11
-    barra2_dl.download.barra2_point(barra2_aus11_csv_url,
-                                      barra2_var_wind_50m,
+    barra2_dl.download.barra2_point(barra2_var_wind_50m,
                                       lat_lon_point,
                                       start_datetime,
                                       end_datetime,
                                       fileout_prefix = 'demo',
-                                      fileout_folder=r'cache',
+                                      fileout_folder= cache_dir,
                                       )
 
     # merge downloaded csvs into a new dataframe
@@ -51,11 +50,6 @@ def main():
     df_converted.to_csv(
         Path(output_dir) / f"{output_filename_prefix}_converted_{start_datetime.strftime("%Y%m%d")}_{end_datetime.strftime("%Y%m%d")}.csv",
         index=False)
-
-    # todo export combined to csv
-    # df_combined.to_csv(
-    #     os.path.join(output_dir,
-    #                  f"{output_filename_prefix}_combined_{start_date_time.strftime("%Y%m%d")}_{end_date_time.strftime("%Y%m%d")}.csv"))
 
 
 if __name__ == '__main__':

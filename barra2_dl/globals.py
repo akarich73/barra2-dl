@@ -43,13 +43,7 @@ class LatLonBBox(TypedDict):
 # barra2_aus11_extents http://www.bom.gov.au/research/publications/researchreports/BRR-067.pdf
 # todo consider updating Barra2 to Barra-r2 to match published data convention
 barra_r2_aus11_lat_lon_bbox = LatLonBBox(north=12.95, south=-57.97, east=207.39, west=88.48)
-
 barra_r2_grid_spacing = 0.11
-
-# base thredds url for BARRA2 11km 1hour reanalysis data
-barra2_aus11_csv_url = ("https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUS-11/BOM/ERA5"
-                        "/historical/hres/BARRA-R2/v1/1hr/{var}/latest/"
-                        "{var}_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_{year}{month:02d}-{year}{month:02d}.nc")
 
 # index for barra2 used to join separate files
 barra2_aus11_index = ['time','station', 'latitude[unit="degrees_north"]', 'longitude[unit="degrees_east"]']

@@ -1,32 +1,37 @@
-"""
-This module contains the barra2 download function(s) .
-"""
-import requests
+"""This module contains the barra2 download function(s)."""
 
+import calendar
 from datetime import datetime, timedelta
 from pathlib import Path
-import calendar
 
-from barra2_dl.helpers import list_months
+import requests
+
 from barra2_dl.globals import LatLonPoint
+from barra2_dl.helpers import list_months
 
 
-def download_file(url: str,
-                  folder_path: str | Path,
-                  file_name: str,
-                  create_folder: bool = False) -> None:
-    """Download the file from the url and saves it as folder_path/filename.
-    If the downloads folder does not exist, it will be created due to the create_folder=True argument.
+def download_file(
+    url: str,
+    folder_path: str | Path,
+    file_name: str,
+    create_folder: bool = False,
+) -> None:
+    """Download the file from the URL and save it as folder_path/filename.
+
+    If the downloads folder does not exist, it will be created due to the
+    create_folder argument.
+
     Args:
-        url: The URL of the file to be downloaded.
-        folder_path: The path where the file should be saved.
-        file_name: The name to save the downloaded file as.
-        create_folder: If True, creates the folder if it does not exist; otherwise, exits if the folder doesn't exist.
+        url (str): The URL of the file to be downloaded.
+        folder_path (str | Path): The path where the file should be saved.
+        file_name (str): The name to save the downloaded file.
+        create_folder (bool): If True, creates the folder if it does not exist; otherwise, exit.
+
     Returns:
         None
     """
     folder = Path(folder_path)
-    file = folder / file_name
+    folder_file = folder / file_name
 
     # Check if the folder exists
     if not folder.exists():
@@ -38,19 +43,16 @@ def download_file(url: str,
             return
 
     # Check if the file already exists
-    if file.exists():
+    if folder_file.exists():
         print(f"The file '{file_name}' already exists in the folder '{folder_path}'.")
     else:
         # Download the URL to the file
         response = requests.get(url)
-        file.write_bytes(response.content)
+        folder_file.write_bytes(response.content)
         print(f"File '{file_name}' has been downloaded to '{folder_path}'.")
 
-    return
 
-
-def barra2_point(base_url: str,
-                 barra2_var: list,
+def barra2_point(barra2_var: list,
                  lat_lon_point: LatLonPoint,
                  start_datetime: str | datetime,
                  end_datetime: str | datetime,
@@ -61,7 +63,6 @@ def barra2_point(base_url: str,
     for each month between start and end datetime.
 
     Args:
-        base_url (str): Use from barra2-dl.globals or set explicitly
         barra2_var (list): Use from barra2-dl.globals or set explicitly
         lat_lon_point (LatLonPoint: TypedDict): Use custom class for barra2-dl.globals or as Dict{'lat':float, 'lon':float}
         start_datetime (str | datetime): Used to define start of inclusive download period
@@ -76,9 +77,25 @@ def barra2_point(base_url: str,
     Todo:
         Add set list of output format options
         Implement grid netCDF download
-
+        Set default fileout_prefix if not set by user
     """
-    # set default fileout_prefix if not set by user
+
+    # base thredds url for BARRA2 11km 1hour reanalysis data
+    barra2_aus11_url = ("https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUS-11/BOM/ERA5"
+                            "/historical/hres/BARRA-R2/v1/1hr/{var}/latest/"
+                            "{var}_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_{year}{month:02d}-{year}{month:02d}.nc")
+
+    # assign to base_url for future functionality to include switching for multiple urls
+    base_url = barra2_aus11_url
+
+    # Set file extension based on fileout_type
+    match fileout_type:
+        case 'csv_file':
+            fileout_ext = '.csv'
+        # case 'netcdf_file':
+        #     fileout_ext = '.nc'
+        case _:
+            raise ValueError(f"Unsupported fileout_type: {fileout_type}")
 
     # loop through each variable requested for download as each variable is saved in a separate url
     for var in barra2_var:
@@ -99,15 +116,10 @@ def barra2_point(base_url: str,
             # add url parameters to base_url
             url += (f"?var={var}&latitude={lat_lon_point['lat']}&longitude={lat_lon_point['lon']}&time_start={time_start_str}&time_end={time_end_str}&accept"
                     f"={fileout_type}")
-            fileout_name = f'{fileout_prefix}_{var}_{time_start.strftime('%Y%m%d')}_{time_end.strftime('%Y%m%d')}.csv'
+            fileout_name = f'{fileout_prefix}_{var}_{time_start.strftime('%Y%m%d')}_{time_end.strftime('%Y%m%d')}{fileout_ext}'
             folder_path = fileout_folder
             download_file(url, folder_path, fileout_name, create_folder=True)
 
             # todo add option to name file_prefix using BARRA2 node; might need index 0 check
             # if fileout_prefix is None:
             #   fileout_prefix = BARRA2_aus11_index[lat_lon_point['lat']][lat_lon_point['lon']]
-
-    return
-
-
-
