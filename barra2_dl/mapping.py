@@ -1,7 +1,7 @@
-"""
-Helper funcitons for geo.
-todo draft functions to set grid for mapping support.
-todo implement for file naming
+"""Helper geo functions.
+Todo:
+    draft functions to set grid for mapping support.
+    implement for file naming
 """
 
 import numpy as np
