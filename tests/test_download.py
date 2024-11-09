@@ -1,8 +1,7 @@
 import pytest
-
 from pandas import Timestamp
 
-from barra2_dl import helpers
+import barra2_dl.download
 
 @pytest.mark.parametrize(('start_datetime', 'end_datetime', 'expected'), [
                             ('1/1/2023','1/1/2024',
@@ -23,5 +22,5 @@ from barra2_dl import helpers
 ])
 def test_list_months(start_datetime: str, end_datetime: str, expected: list) -> None:
     """Test with parametrization."""
-    assert helpers.list_months(start_datetime, end_datetime) == expected
+    assert barra2_dl.download._list_months(start_datetime, end_datetime) == expected
 

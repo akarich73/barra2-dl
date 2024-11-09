@@ -1,14 +1,25 @@
-"""
-This module contains the barra2 merge function(s).
-"""
-import pandas as pd
+"""This module contains the barra2 merge function(s)."""
 
+import logging
+import sys
 from pathlib import Path
 
+import pandas as pd
 
-def merge_suffix_columns(df: pd.DataFrame, suffix_x: str = '_x', suffix_y: str = '_y') -> pd.DataFrame:
-    """
-    Function to merge DataFrame columns with '_x' and '_y' suffixes.
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
+__all__ = [
+    'merge_csvs_to_df',
+]
+
+
+def _merge_suffix_columns(
+    df: pd.DataFrame,
+    suffix_x: str = '_x',
+    suffix_y: str = '_y',
+) -> pd.DataFrame:
+    """Function to merge DataFrame columns with '_x' and '_y' suffixes.
 
     Args:
         df: The DataFrame that contains columns with suffixes to be merged.
@@ -34,72 +45,41 @@ def merge_suffix_columns(df: pd.DataFrame, suffix_x: str = '_x', suffix_y: str =
     return df
 
 
-def merge_csvs_to_df(filein_folder: str,
-                    filename_pattern: str = '*.csv',
-                    index_for_join: str = None) -> pd.DataFrame:
-    """
-    Function to merge csv files iteratively from a folder based on filename wildcard.
-    If filename wildcard is omitted all csv files in the folder will be merged.
+def merge_csvs_to_df(
+    filein_folder: str,
+    index_for_join: str | list[str] = None,
+) -> pd.DataFrame:
+    """Function to merge csv files iteratively from a folder based on filename wildcard.
+
+    Uses outer join based on index_for_join. If filename wildcard is omitted all csv files in the folder will be merged.
 
     Args:
-        filein_folder (str): Optional
-        filename_pattern (str):
-        index_for_join (str):
+        filein_folder (str): Folder
+        index_for_join (str | list[str]): Pandas <on> parameter.
 
     Returns:
         DataFrame: A DataFrame with the merged csvs.
 
     Todo:
-        add .csv check for filename_prefix
+        Add csv check for filename_prefix
+        Add pandas kwargs
     """
+    filename_pattern: str = '*.csv'
 
-    # instantiate dataframe for combined csv results
-    df_combined = pd.DataFrame()
+    # instantiate dataframe for merging csv files
+    df_merged = pd.DataFrame()
 
     for file in Path(filein_folder).glob(filename_pattern):
-        print(f"Merging file: {file}")
-        if df_combined.empty:
+        if df_merged.empty:
             # read csv file without indexing to retain time as column for join
-            df_combined = pd.read_csv(file)
+            df_merged = pd.read_csv(file)
         else:
             # read next file into new df
             df_add = pd.read_csv(file)
-            df_combined = pd.merge(df_combined, df_add, how='outer', on=index_for_join)
-            df_combined = merge_suffix_columns(df_combined)
+            df_merged = pd.merge(df_merged, df_add, how='outer', on=index_for_join)
+            df_merged = _merge_suffix_columns(df_merged)
+            logger.info(f'Merged file: {file}')
+            sys.stdout.write(f'Merged file: {file}')
+            sys.stdout.write('\n')
 
-    return df_combined
-
-
-def export_df_to_csv(dataframe: pd.DataFrame,
-                            fileout_folder: str | Path,
-                            fileout_name: str,
-                            create_folder: bool = True) -> None:
-    """
-    Export a DataFrame to a CSV file in the specified folder with the given file name.
-
-    Args:
-        dataframe (pd.DataFrame): The Pandas DataFrame to export.
-        fileout_folder (str or Path): The path to the folder where the CSV file will be saved.
-        fileout_name (str): The name of the CSV file to save.
-        create_folder (bool): If True, creates the folder if it does not exist; otherwise, exits if the folder doesn't exist.
-
-    Returns:
-        Path: The path of the saved CSV file.
-    """
-    fileout_folder = Path(fileout_folder)
-    # Check if the folder exists
-    if not fileout_folder.exists():
-        if create_folder:
-            fileout_folder.mkdir(parents=True)
-            print(f"The folder '{fileout_folder}' was created.")
-        else:
-            print(f"The folder '{fileout_folder}' does not exist. Exiting...")
-            return
-
-    # Define the full path for the CSV file
-    fileout_path_name = fileout_folder / fileout_name
-
-    # Export the DataFrame to CSV
-    dataframe.to_csv(fileout_path_name, index=False)
-
-    pass
+    return df_merged
