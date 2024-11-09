@@ -6,13 +6,15 @@ todo implement for file naming
 
 import numpy as np
 import pandas as pd
-from typing import Union
 
 
-def generate_point_grid(lat_lon_bbox: Union[dict, tuple], lat_res: float, lon_res: float = None, offset:bool = None) -> (
-    pd.DataFrame):
-    """
-    Create a grid of longitude and latitude points between specified minimum and maximum values.
+def generate_point_grid(
+    lat_lon_bbox: dict | tuple,
+    lat_res: float,
+    lon_res: float = None,
+    offset:bool = None
+) -> pd.DataFrame:
+    """Create a grid of longitude and latitude points between specified minimum and maximum values.
 
     Args:
         lat_lon_bbox (dict | tuple): Dictionary or tuple containing geographic boundaries.
@@ -62,9 +64,12 @@ def generate_point_grid(lat_lon_bbox: Union[dict, tuple], lat_res: float, lon_re
     return df_point_grid
 
 
-def find_nearest_point(df_point_grid: pd.DataFrame, target_lat: float, target_lon: float) -> pd.Series:
-    """
-    Find the nearest point in a DataFrame of latitude, longitude points to a target point (target_lat, target_lon).
+def find_nearest_point(
+    df_point_grid: pd.DataFrame,
+    target_lat: float,
+    target_lon: float
+) -> pd.Series:
+    """Find the nearest point in a DataFrame of latitude, longitude points to a target point (target_lat, target_lon).
 
     Args:
         df_point_grid (pd.DataFrame): DataFrame containing the points with 'Longitude' and 'Latitude' columns.
@@ -87,7 +92,9 @@ def find_nearest_point(df_point_grid: pd.DataFrame, target_lat: float, target_lo
     return df_point_grid.loc[nearest_index]
 
 
-def format_lat_lon(coordinates: dict) -> list[str]:
+def format_lat_lon(
+    coordinates: dict
+) -> list[str]:
     """
     Format a dictionary containing 'lat' and 'lon' as floats to a string with 2 decimal precision,
     converting any negative values to 'S'.
