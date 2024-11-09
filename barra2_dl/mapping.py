@@ -1,18 +1,55 @@
-"""Helper geo functions.
+"""Helper geo and mapping classes, constants and functions.
 Todo:
-    draft functions to set grid for mapping support.
+    Draft functions to set grid for mapping support.
     implement for file naming
 """
+from dataclasses import dataclass
+from typing import TypedDict
 
 import numpy as np
 import pandas as pd
 
 
-def generate_point_grid(
+#@dataclass
+class LatLonPoint(TypedDict):
+    """TypedDict to store a point as latitude and longitude.
+
+    Attributes:
+        lat (float): latitude.
+        lon (float): longitude.
+
+    """
+    lat: float
+    lon: float
+
+
+@dataclass
+class LatLonBBox(TypedDict):
+    """TypedDict to store a north south east west bounding box by latitude and longitude.
+
+    Attributes:
+        north (float): latitude.
+        south (float): latitude.
+        east (float): longitude.
+        west (float): longitude.
+
+    Todo:
+        Add checks to make sure co-ordinates are correct with respect to each other.
+    """
+    north: float
+    south: float
+    east: float
+    west: float
+
+# barra2_aus11_extents http://www.bom.gov.au/research/publications/researchreports/BRR-067.pdf
+BARRA2_AU11_LAT_LON_BBOX = LatLonBBox(north=12.95, south=-57.97, east=207.39, west=88.48)
+BARRA2_AUS11_GRID_SPACING = 0.11
+
+def _generate_point_grid(
     lat_lon_bbox: dict | tuple,
     lat_res: float,
     lon_res: float = None,
-    offset:bool = None
+    offset:bool = None,
 ) -> pd.DataFrame:
     """Create a grid of longitude and latitude points between specified minimum and maximum values.
 
@@ -64,10 +101,10 @@ def generate_point_grid(
     return df_point_grid
 
 
-def find_nearest_point(
+def _find_nearest_point(
     df_point_grid: pd.DataFrame,
     target_lat: float,
-    target_lon: float
+    target_lon: float,
 ) -> pd.Series:
     """Find the nearest point in a DataFrame of latitude, longitude points to a target point (target_lat, target_lon).
 
@@ -92,11 +129,10 @@ def find_nearest_point(
     return df_point_grid.loc[nearest_index]
 
 
-def format_lat_lon(
-    coordinates: dict
+def _format_lat_lon(
+    coordinates: dict,
 ) -> list[str]:
-    """
-    Format a dictionary containing 'lat' and 'lon' as floats to a string with 2 decimal precision,
+    """Format a dictionary containing 'lat' and 'lon' as floats to a string with 2 decimal precision,
     converting any negative values to 'S'.
 
     Args:

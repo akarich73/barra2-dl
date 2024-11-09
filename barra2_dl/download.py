@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-from barra2_dl.globals import LatLonPoint
+from barra2_dl.mapping import LatLonPoint
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -24,7 +24,7 @@ def _list_months(
     end_datetime: str,
     freq: str = 'MS',
 ) -> list:
-    """Generate list of months from input start and end datetime for url file loop.
+    """Generate list of months from input start and end datetime for download url file loop.
 
     Args:
         start_datetime: str or datetime-like, Left bound for generating dates.
@@ -51,7 +51,7 @@ def _download_file(
     folder_path: str | Path,
     file_name: str,
 ) -> None:
-    """Download the file from the URL and save it as folder_path/filename.
+    """Download the file from the url and save it as folder_path/filename.
 
     If the downloads folder does not exist, it will be created due to the
     create_folder argument.

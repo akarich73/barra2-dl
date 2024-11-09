@@ -115,7 +115,9 @@ def wind_components_to_direction(
         raise ValueError('Both arguments must be either both float/int or both lists of float/int.')
 
 
-def convert_wind_components(df_merged: pd.DataFrame) -> pd.DataFrame:
+def convert_wind_components(
+    df_merged: pd.DataFrame,
+) -> pd.DataFrame:
     """Converts columns of wind components ua* and va* to v and phi.
 
     Args:
@@ -139,7 +141,7 @@ def convert_wind_components(df_merged: pd.DataFrame) -> pd.DataFrame:
         mask_ua = df_merged.columns.str.contains(tup[0])  # select the ua column header
         mask_va = df_merged.columns.str.contains(tup[1])  # select the va column header
 
-        if np.any(mask_ua is True) and np.any(mask_va is True):
+        if np.any(mask_ua == True) and np.any(mask_va == True):
             # create temporary dataframe for ua and va using the mask
             df_merged_ua = df_merged.loc[:, mask_ua]
             df_merged_va = df_merged.loc[:, mask_va]

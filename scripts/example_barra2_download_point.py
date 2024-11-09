@@ -5,14 +5,15 @@ from pathlib import Path
 
 import barra2_dl
 import barra2_dl.convert
-from barra2_dl.globals import BARRA2_AUS11_WIND_VARS, barra2_var_wind_50m, BARRA2_AUS11_INDEX
+from barra2_dl.globals import barra2_var_wind_50m, BARRA2_AUS11_INDEX
+from barra2_dl.mapping import LatLonPoint
 
 # set directory for caching downloaded files
 cache_dir = r'scripts\cache'
 output_dir = r'scripts\output'
 
-# set location
-lat_lon_point = dict(lat=-23.5527472, lon=133.3961111)
+# set location todo update to use mapping class
+demo_lat_lon_point = LatLonPoint(lat=-23.5527472, lon=133.3961111)
 
 # set time ref https://stackoverflow.com/questions/17594298/date-time-formats-in-python
 start_datetime = datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
@@ -31,7 +32,7 @@ def main():
                                       lat_lon_point,
                                       start_datetime,
                                       end_datetime,
-                                      fileout_prefix = 'demo',
+                                      fileout_prefix = output_filename_prefix,
                                       fileout_folder= cache_dir,
                                       )
 
