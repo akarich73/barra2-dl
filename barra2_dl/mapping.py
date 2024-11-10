@@ -1,46 +1,94 @@
 """Helper geo and mapping classes, constants and functions.
+
+References:
+    https://stackoverflow.com/questions/79174938/how-to-fix-order-of-inherited-subclasses-in-python-dataclass/79174970
+
 Todo:
     Draft functions to set grid for mapping support.
-    implement for file naming
+    Implement for file naming
 """
 from dataclasses import dataclass
-from typing import TypedDict
 
 import numpy as np
 import pandas as pd
 
 
-#@dataclass
-class LatLonPoint(TypedDict):
-    """TypedDict to store a point as latitude and longitude.
+class Geodetic(float):
+    """Float specialization base class for Latitude and Longitude.
+
+    Adds _check_limits on min max to avoid code duplication on setting and checking float value.
 
     Attributes:
-        lat (float): latitude.
-        lon (float): longitude.
-    """
-    lat: float
-    lon: float
+        min (float): Minimum allowable value.
+        max (float): Maximum allowable value.
+        name (str): Name
+
+  """
+    min = 0.0
+    max = 0.0
+    name = "Geodetic"
+
+    def __new__(cls, value):
+        instance = super().__new__(cls, value)
+        instance._check_limits()
+        return instance
+
+    def _check_limits(self):
+        # we _ARE_ a float, so "self"  can be used directly for the value:
+        if not self.min <= self <= self.max:
+            raise ValueError(f"{self.name} must be from {self.min} to {self.max}")
+
+
+class Latitude(Geodetic):
+    min = -90
+    max = 90
+    name = "Lat"
+
+
+class Longitude(Geodetic):
+    min = -180
+    max = 180
+    name = "Lon"
 
 
 @dataclass
-class LatLonBBox(TypedDict):
-    """TypedDict to store a north south east west bounding box by latitude and longitude.
+class LatLonPoint:
+    """Custom point
+        Attributes:
+        lat (Latitude): Custom Geodetic
+        lon (Longitude): Custom Geodetic
+    """
+    lat: Latitude
+    lon: Longitude
+
+    def __post_init__(self):
+        for field_name, field in self.__dataclass_fields__.items():
+            setattr(self, field_name, field.type(getattr(self, field_name)))
+
+
+@dataclass
+class LatLonBBox:
+    """A north south east west bounding box by latitude and longitude.
 
     Attributes:
-        north (float): latitude.
-        south (float): latitude.
-        east (float): longitude.
-        west (float): longitude.
+        north (Latitude): Custom Geodetic
+        south (Latitude): Custom Geodetic
+        east (Longitude): Custom Geodetic
+        west (Longitude): Custom Geodetic
 
     Todo:
         Add checks to make sure co-ordinates are correct with respect to each other.
     """
-    north: float
-    south: float
-    east: float
-    west: float
+    north: Latitude
+    south: Latitude
+    east: Longitude
+    west: Longitude
 
+    def __post_init__(self):
+        for field_name, field in self.__dataclass_fields__.items():
+            setattr(self, field_name, field.type(getattr(self, field_name)))
 
+#todo the following are draft functions
 def _generate_point_grid(
     lat_lon_bbox: dict | tuple,
     lat_res: float,
