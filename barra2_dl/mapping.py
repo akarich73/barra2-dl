@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 
-class Geodetic(float):
+class _Geodetic(float):
     """Float specialization base class for Latitude and Longitude.
 
     Adds _check_limits on min max to avoid code duplication on setting and checking float value.
@@ -39,13 +39,13 @@ class Geodetic(float):
             raise ValueError(f"{self.name} must be from {self.min} to {self.max}")
 
 
-class Latitude(Geodetic):
+class Latitude(_Geodetic):
     min = -90
     max = 90
     name = "Lat"
 
 
-class Longitude(Geodetic):
+class Longitude(_Geodetic):
     min = -180
     max = 180
     name = "Lon"
