@@ -18,7 +18,7 @@ helpers_wind.calculate_wind_speed
     (0., 0., 0.),
 ])
 def test_calculate_wind_speed(u: float, v: float, expected: float) -> None:
-    """Example test with parametrization."""
+    """Test with parametrization."""
     assert barra2_dl.convert.calculate_wind_speed(u, v) == expected
 
 """

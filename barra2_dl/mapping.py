@@ -17,7 +17,6 @@ class LatLonPoint(TypedDict):
     Attributes:
         lat (float): latitude.
         lon (float): longitude.
-
     """
     lat: float
     lon: float
