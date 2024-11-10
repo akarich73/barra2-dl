@@ -1,5 +1,7 @@
 """This module contains global or default variables required to download barra2-dl data from thredds.nci.org.au."""
 
+from .mapping import LatLonBBox
+
 # index for barra2 used to join separate files
 BARRA2_AUS11_INDEX = [
     'time',
@@ -29,8 +31,13 @@ BARRA2_AUS11_WIND_VARS = [
     ('ua1000m', 'va1000m', '1000m[unit="m s-1"]'),
 ]
 
-# set list of BARRA2 variables to download default list is eastward wind (ua*), northward wind (va*), and air temperature at 50m (ta50m)
-barra2_var_wind_custom = ['ua50m', 'va50m', 'ua100m', 'va100m', 'ua150m', 'va150m', 'ta50m']
+# barra2_aus11_extents http://www.bom.gov.au/research/publications/researchreports/BRR-067.pdf
+BARRA2_AU11_LATLONBBOX = LatLonBBox(north=12.95, south=-57.97, east=207.39, west=88.48)
+
+BARRA2_AUS11_GRID_SPACING = 0.11
+
+# default list of BARRA2 variables for wind analysis
+barra2_var_wind_default = ['ua50m', 'va50m', 'ua100m', 'va100m', 'ua150m', 'va150m', 'ta50m']
 
 # optional limited variables to test
 barra2_var_wind_50m = ['ua50m', 'va50m', 'ta50m']

@@ -40,9 +40,6 @@ class LatLonBBox(TypedDict):
     east: float
     west: float
 
-# barra2_aus11_extents http://www.bom.gov.au/research/publications/researchreports/BRR-067.pdf
-BARRA2_AU11_LAT_LON_BBOX = LatLonBBox(north=12.95, south=-57.97, east=207.39, west=88.48)
-BARRA2_AUS11_GRID_SPACING = 0.11
 
 def _generate_point_grid(
     lat_lon_bbox: dict | tuple,
