@@ -7,10 +7,10 @@
       <excludeFolder url="file://$MODULE_DIR$/htmlcov" />
       <excludeFolder url="file://$MODULE_DIR$/tests/htmlcov" />
       <excludeFolder url="file://$MODULE_DIR$/tests/test_cache" />
-      <excludeFolder url="file://$MODULE_DIR$/tests/test_combined" />
       <excludeFolder url="file://$MODULE_DIR$/tests/test_download" />
       <excludeFolder url="file://$MODULE_DIR$/scripts/cache" />
       <excludeFolder url="file://$MODULE_DIR$/scripts/output" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/test_output" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 (barra2-dl)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
