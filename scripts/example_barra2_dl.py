@@ -70,7 +70,7 @@ barra2_dl.download.get_point_data(
 #%%
 df_merged = barra2_dl.merge.merge_csvs_to_df(
     filein_folder= cache_dir,
-    filename_pattern=f'*{fileout_prefix}*.csv',
+    filename_pattern=f'{fileout_prefix}*.csv',
     index_for_join=BARRA2_AUS11_INDEX,
 )
 print(df_merged.head())
