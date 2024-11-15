@@ -47,6 +47,7 @@ def _merge_suffix_columns(
 
 def merge_csvs_to_df(
     filein_folder: str,
+    filename_pattern: str = '*.csv',
     index_for_join: str | list[str] = None,
 ) -> pd.DataFrame:
     """Function to merge csv files iteratively from a folder based on filename wildcard.
@@ -55,6 +56,7 @@ def merge_csvs_to_df(
 
     Args:
         filein_folder (str): Folder
+        filename_pattern (str): Filename matching pattern. Use if multiple location files are in same folder.
         index_for_join (str | list[str]): Pandas <on> parameter.
 
     Returns:
@@ -64,8 +66,6 @@ def merge_csvs_to_df(
         Add csv check for filename_prefix
         Add pandas kwargs
     """
-    filename_pattern: str = '*.csv'
-
     # instantiate dataframe for merging csv files
     df_merged = pd.DataFrame()
 
