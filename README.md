@@ -62,25 +62,33 @@ https://opus.nci.org.au/pages/viewpage.action?pageId=264241166
 
 ## Features
 
+- Point data download to closest node from BARRA2 AUS-11 Reanalysis data 
 - Fully typed with annotations and checked with mypy, [PEP561 compatible](https://www.python.org/dev/peps/pep-0561/)
-- [todo]
 
 ## Installation
 
 ```bash
-pip install barra2-dl
+# Clone or download repo
 ```
 
 ## Example
 
-[todo] Showcase how your project can be used:
-
 ```python
-from barra2_dl.example import some_function
+import barra2_dl
 
-print(some_function(3, 4))
-# => 7
+from barra2_dl.globals import barra2_var_wind_50m, barra2_var_wind_default, BARRA2_AUS11_INDEX
+
+barra2_dl.download.get_point_data(
+    barra2_vars = barra2_var_wind_default,
+    latitude = -23.5527472,
+    longitude = 133.3961111,
+    start_datetime= datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
+    end_datetime = datetime.strptime("2023-03-31T23:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
+    fileout_prefix = "Demo",
+    fileout_folder= r"cache_dir",
+)
 ```
+Also refer to the example Jupyter Notebook and script 
 
 ## License
 
