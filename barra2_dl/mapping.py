@@ -88,7 +88,7 @@ class LatLonBBox:
         for field_name, field in self.__dataclass_fields__.items():
             setattr(self, field_name, field.type(getattr(self, field_name)))
 
-#todo the following are draft functions
+#todo the following are draft functions and not yet implemented
 def _generate_point_grid(
     lat_lon_bbox: dict | tuple,
     lat_res: float,

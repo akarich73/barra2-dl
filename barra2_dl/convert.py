@@ -134,7 +134,7 @@ def convert_wind_components(
         Update function as following leverages global variables
     """
     # loop through all possible wind components
-    df_processed = pd.DataFrame()
+    df_processed = df_merged
 
     for tup in BARRA2_AUS11_WIND_VARS:
         mask_wind_speed_h = tup[0][2:]
@@ -146,8 +146,6 @@ def convert_wind_components(
             df_merged_ua = df_merged.loc[:, mask_ua]
             df_merged_va = df_merged.loc[:, mask_va]
 
-            sys.stdout.write('Converting: ' + df_merged_ua.columns.values[0] + ', ' + df_merged_va.columns.values[0])
-            sys.stdout.write('\n')
 
             df_processed_v = pd.DataFrame(
                 wind_components_to_speed(df_merged_ua.iloc[:, 0].tolist(), df_merged_va.iloc[:, 0].tolist()),
@@ -161,11 +159,14 @@ def convert_wind_components(
             )
 
             # Merge the current variable DataFrame with the combined DataFrame
-            df_processed = df_merged.join(df_processed_v)
+            df_processed = df_processed.join(df_processed_v)
             df_processed = df_processed.join(df_processed_phi_met)
 
-    # check if df_processed was updated
-    if df_processed.empty:
-        raise ValueError('No ua or va values in the dataframe to convert.')
+            sys.stdout.write('Converted: ' + df_merged_ua.columns.values[0] + ', ' + df_merged_va.columns.values[0])
+            sys.stdout.write('\n')
+
+    # todo check if df_processed was updated
+    # if df_processed == df_merged:
+    #     raise ValueError('No ua or va values in the dataframe to convert.')
 
     return df_processed

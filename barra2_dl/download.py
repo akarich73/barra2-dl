@@ -81,7 +81,7 @@ def _download_file(
         sys.stdout.write('\n')
     else:
         # Download the URL to the file
-        response = requests.get(url, timeout=10)
+        response = requests.get(url) #, timeout=20
         folder_file.write_bytes(response.content)
         logger.info(f'<{file_name}> downloaded to <{folder_path}>')
         sys.stdout.write(f'<{file_name}> downloaded to <{folder_path}>')
@@ -106,6 +106,7 @@ def _list_timestamp_range(
 
     Todo:
         Not implemented function for only downloading new data based on existing time range.
+        Add valid csv file check for downloading files from last 3 months
     """
     if timestamp_column not in dataframe.columns:
         raise ValueError(f'Column <{timestamp_column}> does not exist in the DataFrame.')
@@ -125,7 +126,8 @@ def _list_timestamp_range(
 
 def get_point_data(
     barra2_vars: list,
-    lat_lon_point: LatLonPoint,
+    latitude: float | int,
+    longitude: float | int,
     start_datetime: str | datetime,
     end_datetime: str | datetime,
     fileout_prefix: str = None,
@@ -140,7 +142,8 @@ def get_point_data(
 
     Args:
         barra2_vars (list): Use from barra2-dl.globals or set explicitly
-        lat_lon_point (LatLonPoint: TypedDict): Use custom class for barra2-dl.globals
+        latitude (float |int):  Point latitude.
+        longitude (float |int):  Point longitude.
         start_datetime (str | datetime): Used to define start of inclusive download period
         end_datetime (str | datetime): Used to define end of inclusive download period
         fileout_prefix (str): Optional prefix for downloaded file. E.g. location reference
@@ -195,7 +198,7 @@ def get_point_data(
 
             # add url parameters to base_url
             url += (
-                f"?var={barra2_var}&latitude={lat_lon_point['lat']}&longitude={lat_lon_point['lon']}"
+                f"?var={barra2_var}&latitude={latitude}&longitude={longitude}"
                 f'&time_start={time_start_str}&time_end={time_end_str}'
                 f'&accept={fileout_type}'
             )
