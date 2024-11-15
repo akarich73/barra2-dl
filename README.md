@@ -74,6 +74,9 @@ https://opus.nci.org.au/pages/viewpage.action?pageId=264241166
 ## Example
 
 ```python
+from datetime import datetime
+from pathlib import Path
+
 import barra2_dl
 
 from barra2_dl.globals import barra2_var_wind_50m, barra2_var_wind_default, BARRA2_AUS11_INDEX
