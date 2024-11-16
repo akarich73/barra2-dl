@@ -47,7 +47,6 @@ specific locations and time periods.
 
 The following links provide an example of the urls:
 
->
 >Example URL for NetCDF grid files for ua50m wind speed:
 > https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUS-11/BOM/ERA5/historical/hres/BARRA-R2/v1/1hr/ua50m/latest/ua50m_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_197901-197901.nc?var=ua50m&north=-36&west=140&east=141&south=-37&horizStride=1&time_start=1979-01-01T00:00:00Z&time_end=1979-01-31T23:00:00Z&&&accept=netcdf3
 >
@@ -106,9 +105,9 @@ Also refer to the example Jupyter Notebook and script
 5) CLI interface
 
 ## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Refer to [Contributing.md](https://github.com/akarich73/barra2-dl/blob/cddf58cb8224bcab8c5311b4f10501281bec84f7/CONTRIBUTING.md)
 
-Or if you are so inclined or use the data for commercial work you can 
+Or if you are so inclined or use this for commercial work you can 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/richardgledhill)
 
 ## Authors and acknowledgment

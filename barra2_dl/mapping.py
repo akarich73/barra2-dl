@@ -1,11 +1,11 @@
-"""Helper geo and mapping classes, constants and functions.
+"""This modules contains helper geo and mapping classes, constants and functions.
 
 References:
     https://stackoverflow.com/questions/79174938/how-to-fix-order-of-inherited-subclasses-in-python-dataclass/79174970
 
 Todo:
     Draft functions to set grid for mapping support.
-    Implement for file naming
+    Implement _format_lat_lon for converting lat lon for file naming
 """
 from dataclasses import dataclass
 
@@ -92,7 +92,7 @@ class LatLonBBox:
 def _generate_point_grid(
     lat_lon_bbox: dict | tuple,
     lat_res: float,
-    lon_res: float = None,
+    lon_res: float,
     offset:bool = None,
 ) -> pd.DataFrame:
     """Create a grid of longitude and latitude points between specified minimum and maximum values.
