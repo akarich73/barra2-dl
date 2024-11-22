@@ -174,22 +174,22 @@ def _find_nearest_point(
 
 
 def _format_lat_lon(
-    coordinates: dict,
+    latitude: float | int,
+    longitude: float | int,
 ) -> list[str]:
     """Format a dictionary containing 'lat' and 'lon' as floats to a string with 2 decimal precision,
     converting any negative values to 'S'.
 
     Args:
-        coordinates (dict): Dictionary containing 'lat' and 'lon' as floats.
+        longitude (float | int):
+        latitude (float | int):
 
     Returns:
-        str: Formatted string of the latitude and longitude.
+        list[str]: Formatted string of the latitude and longitude.
     """
-    lat = coordinates.get('lat', 0.0)
-    lon = coordinates.get('lon', 0.0)
 
-    formatted_lat = ('S' if lat < 0 else '') + '{:.2f}'.format(abs(lat))
-    formatted_lon = '{:.2f}'.format(abs(lon))
+    formatted_lat = ('S' if latitude < 0 else '') + '{:.2f}'.format(abs(latitude))
+    formatted_lon = '{:.2f}'.format(abs(longitude))
 
     return [formatted_lat, formatted_lon]
 

@@ -53,11 +53,15 @@ The following links provide an example of the urls:
 >Or as grid points to get CSV files for ua50m wind speed:
 >https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUS-11/BOM/ERA5/historical/hres/BARRA-R2/v1/1hr/ua50m/latest/ua50m_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_197901-197901.nc?var=ua50m&latitude=-36&longitude=140&time_start=1979-01-01T00%3A00%3A00Z&time_end=1979-01-31T23%3A00%3A00Z&timeStride=&vertCoord=&accept=csv
 
+Reference for downloading from thredds is provided here: 
+https://opus.nci.org.au/display/DAE/examples-thredds
+
 For a full list of BARRA2 variables refer to the BARRA2 FAQ:
 https://opus.nci.org.au/pages/viewpage.action?pageId=264241306
 
 Refer to BARRA2 documentation for further details:
 https://opus.nci.org.au/pages/viewpage.action?pageId=264241166
+
 
 ## Features
 
@@ -116,7 +120,4 @@ Or if you are so inclined or use this for commercial work you can
 
 This project was generated with [`wemake-python-package`](https://github.com/wemake-services/wemake-python-package). Current template version is: [326622187bdef4596c6fe0901e481bc6e7ebc93a](https://github.com/wemake-services/wemake-python-package/tree/326622187bdef4596c6fe0901e481bc6e7ebc93a). See what is [updated](https://github.com/wemake-services/wemake-python-package/compare/326622187bdef4596c6fe0901e481bc6e7ebc93a...master) since then.
 
-## References
 
-https://opus.nci.org.au/pages/viewpage.action?pageId=264241166
-https://opus.nci.org.au/display/DAE/examples-thredds
