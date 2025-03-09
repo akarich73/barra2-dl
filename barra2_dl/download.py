@@ -5,6 +5,8 @@ import logging
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
+from multiprocessing import cpu_count
+from multiprocessing.pool import ThreadPool
 
 import pandas as pd
 import requests
@@ -15,9 +17,11 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 __all__ = [
-    'get_point_data'
+    'get_point_data',
+    'get_point_data_urlfilenames',
 ]
 
+type URLFilenamePair = tuple[str, str]
 
 def _list_months(
     start_datetime: str,
@@ -44,48 +48,6 @@ def _list_months(
         raise ValueError('Invalid date(s) provided: {}'.format(error))
 
     return pd.date_range(start=start_datetime, end=end_datetime, freq=freq).tolist()
-
-
-def _download_file(
-    url: str,
-    folder_path: str | Path,
-    file_name: str,
-) -> None:
-    """Download the file from the url and save it as folder_path/filename.
-
-    If the downloads folder does not exist, it will be created due to the
-    create_folder argument.
-
-    Args:
-        url (str): The URL of the file to be downloaded.
-        folder_path (str | Path): The path where the file should be saved.
-        file_name (str): The name to save the downloaded file.
-
-    Returns: None
-
-    Raises:
-        FileNotFoundError: If folder does not exist.
-    """
-    folder = Path(folder_path)
-    folder_file = folder / file_name
-
-    # Check if the folder exists
-    if not folder.exists():
-        logger.error(f'{folder_path} does not exist.')
-        raise FileNotFoundError(f'The folder {folder_path} does not exist. Create folder first.')
-
-    # Check if the file already exists
-    if folder_file.exists():
-        logger.info(f'<{file_name}> already exists in the folder. Not downloaded')
-        sys.stdout.write(f'<{file_name}> already exists in the folder <{folder_path}>')
-        sys.stdout.write('\n')
-    else:
-        # Download the URL to the file
-        response = requests.get(url) #, timeout=20
-        folder_file.write_bytes(response.content)
-        logger.info(f'<{file_name}> downloaded to <{folder_path}>')
-        sys.stdout.write(f'<{file_name}> downloaded to <{folder_path}>')
-        sys.stdout.write('\n')
 
 
 def _list_timestamp_range(
@@ -122,6 +84,166 @@ def _list_timestamp_range(
     last_timestamp = dataframe[timestamp_column].iloc[-1]
 
     return [first_timestamp, last_timestamp]
+
+
+def _download_file(
+    url: str,
+    file_name: str,
+    folder_path: str | Path,
+) -> None:
+    """Download the file from the url and save it as folder_path/filename.
+
+    If the downloads folder does not exist, it will be created due to the
+    create_folder argument.
+
+    Args:
+        url (str): The URL of the file to be downloaded.
+        file_name (str): The name to save the downloaded file.
+        folder_path (str | Path): The path where the file should be saved.
+
+    Returns: None
+
+    Raises:
+        FileNotFoundError: If folder does not exist.
+    """
+    folder = Path(folder_path)
+    folder_file = folder / file_name
+
+    # Check if the folder exists
+    if not folder.exists():
+        logger.error(f'{folder_path} does not exist.')
+        raise FileNotFoundError(f'The folder {folder_path} does not exist. Create folder first.')
+
+    # Check if the file already exists
+    if folder_file.exists():
+        logger.info(f'<{file_name}> already exists in the folder. Not downloaded')
+        sys.stdout.write(f'<{file_name}> already exists in the folder <{folder_path}>')
+        sys.stdout.write('\n')
+    else:
+        # Download the URL to the file
+        response = requests.get(url) #, timeout=20
+        folder_file.write_bytes(response.content)
+        logger.info(f'<{file_name}> downloaded to <{folder_path}>')
+        sys.stdout.write(f'<{file_name}> downloaded to <{folder_path}>')
+        sys.stdout.write('\n')
+
+
+def _download_files_multithread(
+    urlfilenames: list[URLFilenamePair],
+    folder_path: str | Path,
+) -> None:
+    """Download all files from urls in list of URLFilenamePairs and save it as folder_path/filename.
+
+
+    Args:
+        urlfilenames (str): The URL of the file to be downloaded.
+        folder_path (str | Path): The path where the file should be saved.
+
+    Returns: None
+
+    Raises: None
+
+    References:
+    https://opensourceoptions.com/use-python-to-download-multiple-files-or-urls-in-parallel/
+    """
+    cpus = cpu_count()
+    with ThreadPool(cpus - 1) as pool:
+        pool.starmap(_download_file, [(url, filename, folder_path) for url, filename in urlfilenames])
+
+
+def get_point_data_urlfilenames(
+    barra2_vars: list,
+    latitude: float | int,
+    longitude: float | int,
+    start_datetime: str | datetime,
+    end_datetime: str | datetime,
+    fileout_prefix: str = None,
+    fileout_type: str = 'csv_file',
+) -> list[URLFilenamePair]:
+    """Generate a list of URLs and Filenames for downloading barra2 point data for each var in barra2_vars at the nearest node for a given period.
+
+    Data downloaded for each month between start and end datetime.
+    Downloaded files into fileout_folder as f'{fileout_prefix}_{var}_{time_start[:10]}_{time_end[:10]}.csv'
+    Currently limited to csv file download only.
+
+    Args:
+        barra2_vars (list): Use from barra2-dl.globals or set explicitly
+        latitude (float |int):  Point latitude.
+        longitude (float |int):  Point longitude.
+        start_datetime (str | datetime): Used to define start of inclusive download period
+        end_datetime (str | datetime): Used to define end of inclusive download period
+        fileout_prefix (str): Optional prefix for downloaded file. E.g. location reference
+        fileout_type (str): Output file option, 'csv_file'
+
+    Returns: None
+
+    Raises:
+        ValueError: If not csv file set for export.
+
+    Todo:
+        Add set list of output format options
+        Add additional output types
+        Implement grid netCDF download
+        Set default fileout_prefix if not set by user
+        Add option to name file_prefix using BARRA2 node if fileout_prefix is None
+    """
+    # base thredds url for BARRA2 11km 1hour reanalysis data
+    barra2_aus11_url = (
+        'https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUS-11/BOM/ERA5'
+        '/historical/hres/BARRA-R2/v1/1hr/{var}/latest/'
+        '{var}_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_{year}{month:02d}-{year}{month:02d}.nc'
+    )
+
+    # assign to base_url for future functionality to include switching for multiple urls
+    base_url = barra2_aus11_url
+
+    # Set file extension based on fileout_type
+    match fileout_type:
+        case 'csv_file':
+            fileout_ext = 'csv'
+        case _:
+            logger.error(f'Unsupported fileout_type: {fileout_type}')
+            raise ValueError(f'{fileout_type} is currently not supported.')
+
+    # create empty list for url and filename
+    point_data_URLFilenamePair = []
+
+    # loop through each variable requested for download as each variable is saved in a separate url
+    for barra2_var in barra2_vars:
+        # loop through each month as each BARRA2 file is saved by month todo check index enumerate addition works
+        for date in _list_months(start_datetime, end_datetime, freq='MS'):
+            year = date.year
+            month = date.month
+            time_start = date
+            time_start_str = date.isoformat() + 'Z'
+            # Get the number of days in the current month
+            days_in_month = calendar.monthrange(year, month)[1]
+            time_end = date + timedelta(days=days_in_month) + timedelta(hours=-1)
+            time_end_str = time_end.isoformat() + 'Z'
+
+            # update thredds_base_url and set as url for request
+            url = base_url.format(var=barra2_var, year=year, month=month)
+
+            # add url parameters to base_url
+            url += (
+                f"?var={barra2_var}&latitude={latitude}&longitude={longitude}"
+                f'&time_start={time_start_str}&time_end={time_end_str}'
+                f'&accept={fileout_type}'
+            )
+
+            # set fileout_name
+            fileout_name = (
+                f'{fileout_prefix}_'
+                f'{barra2_var}_'
+                f"{time_start.strftime('%Y%m%d')}_{time_end.strftime('%Y%m%d')}"
+                f'.{fileout_ext}'
+            )
+
+            point_data_URLFilenamePair.append((url, fileout_name))
+
+    return point_data_URLFilenamePair
+
+
 
 
 def get_point_data(
@@ -202,6 +324,7 @@ def get_point_data(
                 f'&time_start={time_start_str}&time_end={time_end_str}'
                 f'&accept={fileout_type}'
             )
+
             # set fileout_name
             fileout_name = (
                 f'{fileout_prefix}_'
@@ -212,3 +335,6 @@ def get_point_data(
 
             # download file
             _download_file(url, fileout_folder, fileout_name)
+
+
+
