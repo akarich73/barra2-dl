@@ -1,16 +1,17 @@
+"""This module contains the barra2.download test function(s)."""
+import os
 from datetime import datetime
 
 import pytest
-import os
 from pandas import Timestamp
 
-import barra2_dl.download, barra2_dl.globals
-from barra2_dl.mapping import LatLonPoint
+import barra2_dl.download
+import barra2_dl.globals
 from barra2_dl.globals import (
-    BARRA2_AUS11_INDEX,
-    barra2_var_wind_50m,
     barra2_var_wind_default,
 )
+from barra2_dl.mapping import LatLonPoint
+
 
 @pytest.mark.parametrize(('start_datetime', 'end_datetime', 'expected'), [
                             ('1/1/2023','1/1/2024',
@@ -100,7 +101,7 @@ def test_get_point_data_urls(
     fileout_prefix,
     expected) -> None:
     """Test with parametrization."""
-    assert barra2_dl.download.get_point_data_urlfilenames(
+    assert barra2_dl.download.point_data_urlfilenames(
         barra2_vars,
         latitude,
         longitude,
@@ -109,7 +110,7 @@ def test_get_point_data_urls(
         fileout_prefix,
     ) == expected
 
-# todo fix this to test downloads
+
 @pytest.mark.parametrize((
     'barra2_vars',
     'latitude',
@@ -123,7 +124,7 @@ def test_get_point_data_urls(
     datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
     datetime.strptime("2023-03-31T23:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
      'demo')])
-def test_download_files(
+def test_download_serial(
     barra2_vars,
     latitude,
     longitude,
@@ -131,11 +132,10 @@ def test_download_files(
     end_datetime,
     fileout_prefix,
     tmp_path) -> None:
+    """Test with parametrization."""
     download_folder = tmp_path / 'cache'
     download_folder.mkdir()
-
-    """Test with parametrization."""
-    urlfilenames = barra2_dl.download.get_point_data_urlfilenames(
+    urlfilenames = barra2_dl.download.point_data_urlfilenames(
         barra2_vars,
         latitude,
         longitude,
@@ -143,7 +143,48 @@ def test_download_files(
         end_datetime,
         fileout_prefix,
     )
-    barra2_dl.download._download_files_multithread(urlfilenames, download_folder)
+
+    barra2_dl.download.download_serial(urlfilenames, download_folder)
+
+    for item in [item[1] for item in urlfilenames]:
+        filename = download_folder / os.path.basename(item)
+        assert filename.exists()
+
+
+@pytest.mark.parametrize((
+    'barra2_vars',
+    'latitude',
+    'longitude',
+    'start_datetime',
+    'end_datetime',
+    'fileout_prefix',),[
+    (barra2_var_wind_default,
+    LatLonPoint(-23.5527472, 133.3961111).lat,
+    LatLonPoint(-23.5527472, 133.3961111).lon,
+    datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
+    datetime.strptime("2023-03-31T23:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
+     'demo')])
+def test_download_multithread(
+    barra2_vars,
+    latitude,
+    longitude,
+    start_datetime,
+    end_datetime,
+    fileout_prefix,
+    tmp_path) -> None:
+    """Test with parametrization."""
+    download_folder = tmp_path / 'cache'
+    download_folder.mkdir()
+    urlfilenames = barra2_dl.download.point_data_urlfilenames(
+        barra2_vars,
+        latitude,
+        longitude,
+        start_datetime,
+        end_datetime,
+        fileout_prefix,
+    )
+
+    barra2_dl.download.download_multithread(urlfilenames, download_folder)
 
     for item in [item[1] for item in urlfilenames]:
         filename = download_folder / os.path.basename(item)

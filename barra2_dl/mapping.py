@@ -22,8 +22,7 @@ class _Geodetic(float):
         min (float): Minimum allowable value.
         max (float): Maximum allowable value.
         name (str): Name
-
-  """
+    """
     min = 0.0
     max = 0.0
     name = "Geodetic"
@@ -34,18 +33,20 @@ class _Geodetic(float):
         return instance
 
     def _check_limits(self):
-        # we _ARE_ a float, so "self"  can be used directly for the value:
+        """We _ARE_ a float, so "self"  can be used directly for the value."""
         if not self.min <= self <= self.max:
             raise ValueError(f"{self.name} must be from {self.min} to {self.max}")
 
 
 class Latitude(_Geodetic):
+    """Specialization base class for Latitude and Longitude."""
     min = -90
     max = 90
     name = "Lat"
 
 
 class Longitude(_Geodetic):
+    """Specialization base class for Latitude and Longitude."""
     min = -180
     max = 180
     name = "Lon"
@@ -53,8 +54,9 @@ class Longitude(_Geodetic):
 
 @dataclass
 class LatLonPoint:
-    """Custom point
-        Attributes:
+    """Custom point.
+
+    Attributes:
         lat (Latitude): Custom Geodetic
         lon (Longitude): Custom Geodetic
     """
@@ -62,6 +64,7 @@ class LatLonPoint:
     lon: Longitude
 
     def __post_init__(self):
+        """Set self attributes."""
         for field_name, field in self.__dataclass_fields__.items():
             setattr(self, field_name, field.type(getattr(self, field_name)))
 
@@ -85,10 +88,11 @@ class LatLonBBox:
     west: Longitude
 
     def __post_init__(self):
+        """Set self attributes."""
         for field_name, field in self.__dataclass_fields__.items():
             setattr(self, field_name, field.type(getattr(self, field_name)))
 
-#todo the following are draft functions and not yet implemented
+
 def _generate_point_grid(
     lat_lon_bbox: dict | tuple,
     lat_res: float,
@@ -110,8 +114,10 @@ def _generate_point_grid(
 
     Raises:
         ValueError: If bounds is neither a dictionary nor a tuple, or if the keys/values are missing or invalid.
-    """
 
+    Todo:
+        Draft function and not yet implemented
+    """
     if isinstance(lat_lon_bbox, dict):
         required_keys = ['north', 'south', 'east', 'west']
         if not all(key in lat_lon_bbox for key in required_keys):
@@ -160,6 +166,8 @@ def _find_nearest_point(
     Returns:
         pd.Series: The row of the nearest point in the DataFrame.
 
+    Todo:
+        Draft function and not yet implemented
     """
     # check if target falls within grid
     min_lat, max_lat = df_point_grid['latitude'].min(), df_point_grid['latitude'].max()
@@ -177,17 +185,20 @@ def _format_lat_lon(
     latitude: float | int,
     longitude: float | int,
 ) -> list[str]:
-    """Format a dictionary containing 'lat' and 'lon' as floats to a string with 2 decimal precision,
-    converting any negative values to 'S'.
+    """Format a dictionary containing 'lat' and 'lon' as floats to a string.
+
+    Uses 2 decimal precision, and converts negative values to 'S'.
 
     Args:
-        longitude (float | int):
-        latitude (float | int):
+        longitude (float | int): Longitude
+        latitude (float | int): Latitude
 
     Returns:
         list[str]: Formatted string of the latitude and longitude.
-    """
 
+    Todo:
+        Draft function and not yet implemented
+    """
     formatted_lat = ('S' if latitude < 0 else '') + '{:.2f}'.format(abs(latitude))
     formatted_lon = '{:.2f}'.format(abs(longitude))
 

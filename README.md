@@ -84,15 +84,18 @@ import barra2_dl
 
 from barra2_dl.globals import barra2_var_wind_50m, barra2_var_wind_default, BARRA2_AUS11_INDEX
 
-barra2_dl.download.get_point_data(
+urlfilenames = barra2_dl.download.point_data_urlfilenames(
     barra2_vars = barra2_var_wind_default,
     latitude = -23.5527472,
     longitude = 133.3961111,
     start_datetime= datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
     end_datetime = datetime.strptime("2023-03-31T23:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
     fileout_prefix = "Demo",
-    fileout_folder= r"cache_dir",
 )
+
+cache_dir = r'scripts\cache'
+
+barra2_dl.download.download_multithread(urlfilenames, cache_dir)
 ```
 Also refer to the example Jupyter Notebook and script 
 
@@ -102,11 +105,12 @@ Also refer to the example Jupyter Notebook and script
 
 
 ## Roadmap
-1) Currently, AUS-11 1hr is implemented. Add option for AUS-22 and AUST-04
-2) Implement bulk download for netCDF (for gridded data) 
-3) Add download progress bar
-4) Multi-location download
-5) CLI interface
+1) Currently, only AUS-11 1hr is implemented. 
+2) Add option for AUS-22 and AUST-04
+3) Implement bulk download for netCDF (for gridded data) 
+4) Add download progress bar
+5) Multi-location download
+6) CLI interface
 
 ## Contributing
 Refer to [Contributing.md](https://github.com/akarich73/barra2-dl/blob/cddf58cb8224bcab8c5311b4f10501281bec84f7/CONTRIBUTING.md)

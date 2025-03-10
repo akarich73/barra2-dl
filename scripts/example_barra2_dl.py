@@ -17,6 +17,7 @@ from barra2_dl.globals import (
     barra2_var_wind_default,
 )
 
+from barra2_dl.mapping import LatLonPoint
 #%%
 print('BARRA2_AUS11_INDEX: ' + BARRA2_AUS11_INDEX.__str__())
 print('barra2_var_wind_50m: ' + barra2_var_wind_50m.__str__())
@@ -32,13 +33,10 @@ output_dir = r'scripts\output'
 # pre-configured LatLonPoint class in barra2_dl.mapping module. Point data is downloaded to the nearest node.
 #%%
 # centre of Australia used for demo
-lat_lon_point = dict(lat=-23.5527472, lon=133.3961111)
+lat_lon_point = {'lat': -23.5527472, 'lon': 133.3961111}
 
-# or use custom class
-from barra2_dl.mapping import LatLonPoint
-
+# or use custom class from mapping
 lat_lon_point = LatLonPoint(-23.5527472, 133.3961111)
-
 print(lat_lon_point)
 #%% md
 # Set start and end time for download.
@@ -53,17 +51,19 @@ end_datetime = datetime.strptime("2023-03-31T23:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
 fileout_prefix = "demo"
 #%% md
 # ## Download point data
-# Use get_point_data to download closest node for the desired variables into the target cache folder.
+# Use point_data_urlfilenames and download_multithread to download the closest node for the desired variables
+# into the target cache folder.
 #%%
-barra2_dl.download.get_point_data(
+urlfilenames = barra2_dl.download.point_data_urlfilenames(
     barra2_vars = barra2_var_wind_default,
     latitude = lat_lon_point.lat,
     longitude = lat_lon_point.lon,
     start_datetime= start_datetime,
     end_datetime = end_datetime,
     fileout_prefix = fileout_prefix,
-    fileout_folder= cache_dir,
 )
+# Use download_multithread with n-1 threads or download_serial with 1 thread
+barra2_dl.download.download_multithread(urlfilenames, cache_dir)
 #%% md
 # ## Combine data
 # Merge downloaded csvs into a new dataframe. Optionally export merged data to a new csv.
@@ -75,7 +75,8 @@ df_merged = barra2_dl.merge.merge_csvs_to_df(
 )
 print(df_merged.head())
 #%%
-df_merged.to_csv(Path(output_dir) / f"{fileout_prefix}_merged_{start_datetime.strftime("%Y%m%d")}_{end_datetime.strftime("%Y%m%d")}.csv", index=False)
+df_merged.to_csv(Path(output_dir) / f"{fileout_prefix}_merged_{start_datetime.strftime("%Y%m%d")}"
+                                    f"_{end_datetime.strftime("%Y%m%d")}.csv", index=False)
 #%% md
 # ## Convert wind speed components
 # Using the merged dataframe, convert ua and va to v and phi_met, and export to new csv file
@@ -83,6 +84,7 @@ df_merged.to_csv(Path(output_dir) / f"{fileout_prefix}_merged_{start_datetime.st
 df_converted = barra2_dl.convert.convert_wind_components(df_merged)
 print(df_converted.head())
 #%%
-df_converted.to_csv(Path(output_dir) / f"{fileout_prefix}_converted_{start_datetime.strftime("%Y%m%d")}_{end_datetime.strftime("%Y%m%d")}.csv", index=False)
+df_converted.to_csv(Path(output_dir) / f"{fileout_prefix}_converted_{start_datetime.strftime("%Y%m%d")}"
+                                       f"_{end_datetime.strftime("%Y%m%d")}.csv", index=False)
 #%% md
 # The merged and converted data is now ready to import into your favourite wind analysis program...

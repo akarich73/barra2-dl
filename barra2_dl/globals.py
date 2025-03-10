@@ -1,6 +1,6 @@
 """This module contains global or default variables required to download barra2-dl data from thredds.nci.org.au."""
 
-from .mapping import LatLonBBox
+# Todo from .mapping import LatLonBBox
 
 # index for barra2 used to join separate files
 BARRA2_AUS11_INDEX = [
