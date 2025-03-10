@@ -8,7 +8,8 @@ from pandas import Timestamp
 import barra2_dl.download
 import barra2_dl.globals
 from barra2_dl.globals import (
-    BARRA2_URL_AUS11_1HR, BARRA2_URL_AUST04_1HR,
+    BARRA2_URL_AUS11_1HR,
+    BARRA2_URL_AUST04_1HR,
     BARRA2_VAR_WIND_DEFAULT,
 )
 from barra2_dl.mapping import LatLonPoint
