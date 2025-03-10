@@ -7,7 +7,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from barra2_dl.globals import BARRA2_AUS11_WIND_VARS
+from barra2_dl.globals import BARRA2_WIND_VARS
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -136,7 +136,7 @@ def convert_wind_components(
     # loop through all possible wind components
     df_processed = df_merged
 
-    for tup in BARRA2_AUS11_WIND_VARS:
+    for tup in BARRA2_WIND_VARS:
         mask_wind_speed_h = tup[0][2:]
         mask_ua = df_merged.columns.str.contains(tup[0])  # select the ua column header
         mask_va = df_merged.columns.str.contains(tup[1])  # select the va column header

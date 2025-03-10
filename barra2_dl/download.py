@@ -29,18 +29,23 @@ def _list_months(
     end_datetime: str,
     freq: str = 'MS',
 ) -> list:
-    """Generate list of months from input start and end datetime for download url file loop.
+    """Generate a list of months between the given start and end datetime.
+
+    This function converts the provided start and end datetime to datetime objects,
+    validates them, and then generates a list of dates at the specified frequency
+    between the start and end datetime.
 
     Args:
-        start_datetime: str or datetime-like, Left bound for generating dates.
-        end_datetime: str or datetime-like, Left bound for generating dates.
-        freq: Frequency string representing the interval between dates (default is 'MS').
+        start_datetime (str or datetime-like): The start datetime for generating dates.
+        end_datetime (str or datetime-like): The end datetime for generating dates.
+        freq (str): The frequency string representing the interval between dates.
+                    Default is 'MS' (Month Start).
 
     Returns:
-        list: List of dates from start to end at the given frequency.
+        list: A list of dates from start to end at the given frequency.
 
     Raises:
-        ValueError: If the provided start_datetime or end_datetime are not valid datetime-like.
+        ValueError: If the provided start_datetime or end_datetime are not valid datetime-like objects.
     """
     try:
         pd.to_datetime(start_datetime)
@@ -92,6 +97,7 @@ def _list_timestamp_range(
 
 
 def point_data_urlfilenames(
+    barra2_url: str,
     barra2_vars: list,
     latitude: float | int,
     longitude: float | int,
@@ -109,6 +115,7 @@ def point_data_urlfilenames(
     Currently limited to csv file download only.
 
     Args:
+        barra2_url (str): Use from barra2-dl.globals
         barra2_vars (list): Use from barra2-dl.globals or set explicitly
         latitude (float |int):  Point latitude.
         longitude (float |int):  Point longitude.
@@ -129,15 +136,15 @@ def point_data_urlfilenames(
         Set default fileout_prefix if not set by user
         Add option to name file_prefix using BARRA2 node if fileout_prefix is None
     """
-    # base thredds url for BARRA2 11km 1hour reanalysis data
-    barra2_aus11_url = (
-        'https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUS-11/BOM/ERA5'
-        '/historical/hres/BARRA-R2/v1/1hr/{var}/latest/'
-        '{var}_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_{year}{month:02d}-{year}{month:02d}.nc'
-    )
+    # base thredds url for BARRA2 11km 1hour reanalysis data moved to globals
+    # barra2_aus11_url = (
+    #     'https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUS-11/BOM/ERA5'
+    #     '/historical/hres/BARRA-R2/v1/1hr/{var}/latest/'
+    #     '{var}_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_{year}{month:02d}-{year}{month:02d}.nc'
+    # )
 
     # assign to base_url for future functionality to include switching for multiple urls
-    base_url = barra2_aus11_url
+    base_url = barra2_url
 
     # Set file extension based on fileout_type
     match fileout_type:
@@ -151,7 +158,7 @@ def point_data_urlfilenames(
     point_data_urlfilenamepair = []
 
     # loop through each variable requested for download as each variable is saved in a separate url
-    for barra2_var in barra2_vars:
+    for var in barra2_vars:
         # loop through each month as each BARRA2 file is saved by month todo check index enumerate addition works
         for date in _list_months(start_datetime, end_datetime, freq='MS'):
             year = date.year
@@ -164,19 +171,19 @@ def point_data_urlfilenames(
             time_end_str = time_end.isoformat() + 'Z'
 
             # update thredds_base_url and set as url for request
-            url = base_url.format(var=barra2_var, year=year, month=month)
-
-            # add url parameters to base_url
-            url += (
-                f"?var={barra2_var}&latitude={latitude}&longitude={longitude}"
-                f'&time_start={time_start_str}&time_end={time_end_str}'
-                f'&accept={fileout_type}'
-            )
+            url = base_url.format(var=var,
+                                  year=year,
+                                  month=month,
+                                  latitude=latitude,
+                                  longitude=longitude,
+                                  time_start_str=time_start_str,
+                                  time_end_str=time_end_str,
+                                  fileout_type=fileout_type)
 
             # set fileout_name
             fileout_name = (
                 f'{fileout_prefix}_'
-                f'{barra2_var}_'
+                f'{var}_'
                 f"{time_start.strftime('%Y%m%d')}_{time_end.strftime('%Y%m%d')}"
                 f'.{fileout_ext}'
             )

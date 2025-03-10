@@ -36,7 +36,8 @@ wind resource and energy assessments, but can be used to download other data fro
 
 Source: https://thredds.nci.org.au/thredds/fileServer/ob53/BARRA2/README.txt
 
-Data from BARRA2 can be downloaded in netCDF or CSV format from the NCI THREDDS server.
+Data from BARRA2 can be downloaded in netCDF or CSV format from the NCI THREDDS server 
+using the NetCDF Subset Service for Grids / Grids As Points.
 
 However, BARRA2 is structured with data for each variable saved in separate folders with separate files for each month. 
 Therefore, for the purpose of downloading a subset of variables for a specific location, 
@@ -82,15 +83,15 @@ from pathlib import Path
 
 import barra2_dl
 
-from barra2_dl.globals import barra2_var_wind_50m, barra2_var_wind_default, BARRA2_AUS11_INDEX
+from barra2_dl.globals import BARRA2_VAR_WIND_50, BARRA2_VAR_WIND_DEFAULT, BARRA2_INDEX
 
 urlfilenames = barra2_dl.download.point_data_urlfilenames(
-    barra2_vars = barra2_var_wind_default,
-    latitude = -23.5527472,
-    longitude = 133.3961111,
-    start_datetime= datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
-    end_datetime = datetime.strptime("2023-03-31T23:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
-    fileout_prefix = "Demo",
+  barra2_vars=BARRA2_VAR_WIND_DEFAULT,
+  latitude=-23.5527472,
+  longitude=133.3961111,
+  start_datetime=datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
+  end_datetime=datetime.strptime("2023-03-31T23:00:00Z", "%Y-%m-%dT%H:%M:%SZ"),
+  fileout_prefix="Demo",
 )
 
 cache_dir = r'scripts\cache'

@@ -3,7 +3,7 @@
 # Todo from .mapping import LatLonBBox
 
 # index for barra2 used to join separate files
-BARRA2_AUS11_INDEX = [
+BARRA2_INDEX = [
     'time',
     'station',
     'latitude[unit="degrees_north"]',
@@ -11,7 +11,7 @@ BARRA2_AUS11_INDEX = [
 ]
 
 # BARRA2 wind speed variable pairs
-BARRA2_AUS11_WIND_VARS = [
+BARRA2_WIND_VARS = [
     ('ua10m', 'va10m', '10m[unit="m s-1"]'),
     ('ua20m', 'va20m', '20m[unit="m s-1"]'),
     ('ua30m', 'va30m', '30m[unit="m s-1"]'),
@@ -37,7 +37,38 @@ BARRA2_AUS11_WIND_VARS = [
 # Todo BARRA2_AUS11_GRID_SPACING = 0.11
 
 # default list of BARRA2 variables for wind analysis
-barra2_var_wind_default = ['ua50m', 'va50m', 'ua100m', 'va100m', 'ua150m', 'va150m', 'ta50m']
+BARRA2_VAR_WIND_DEFAULT = ['ua50m', 'va50m', 'ua100m', 'va100m', 'ua150m', 'va150m', 'ta50m']
 
 # optional limited variables to test
-barra2_var_wind_50m = ['ua50m', 'va50m', 'ta50m']
+BARRA2_VAR_WIND_50 = ['ua50m', 'va50m', 'ta50m']
+
+# Base BOM BARRA2 thredds urls for NetCDF Subset Service for Grids As Points
+# Reference url:
+# https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUS-11/BOM/ERA5/
+# historical/hres/BARRA-R2/v1/1hr/va50m/latest/va50m_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_197901-197901.nc?
+# var=va50m&latitude=-23.5527472&longitude=133.3961111
+# &time_start=1979-01-01T00:00:00Z&time_end=1979-01-31T23:00:00Z&&&accept=csv
+BARRA2_URL_AUS11_1HR = (
+    'https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUS-11/BOM/ERA5'
+    '/historical/hres/BARRA-R2/v1/1hr/{var}/latest/'
+    '{var}_AUS-11_ERA5_historical_hres_BOM_BARRA-R2_v1_1hr_{year}{month:02d}-{year}{month:02d}.nc'
+    '?var={var}&latitude={latitude}&longitude={longitude}'
+    '&time_start={time_start_str}&time_end={time_end_str}'
+    '&timeStride=&vertCoord='
+    '&accept={fileout_type}'
+)
+
+# Reference url:
+# https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUST-04/BOM/ERA5/
+# historical/hres/BARRA-C2/v1/1hr/va50m/latest/va50m_AUST-04_ERA5_historical_hres_BOM_BARRA-C2_v1_1hr_197901-197901.nc?
+# var=va50m&latitude=-23.5527472&longitude=133.3961111
+# &time_start=1979-01-01T00:00:00Z&time_end=1979-01-31T23:00:00Z&&&accept=csv
+BARRA2_URL_AUST04_1HR = (
+    'https://thredds.nci.org.au/thredds/ncss/grid/ob53/output/reanalysis/AUST-04/BOM/ERA5/'
+    'historical/hres/BARRA-C2/v1/1hr/{var}/latest/'
+    '{var}_AUST-04_ERA5_historical_hres_BOM_BARRA-C2_v1_1hr_{year}{month:02d}-{year}{month:02d}.nc'
+    '?var={var}&latitude={latitude}&longitude={longitude}'
+    '&time_start={time_start_str}&time_end={time_end_str}'
+    '&timeStride=&vertCoord='
+    '&accept={fileout_type}'
+)

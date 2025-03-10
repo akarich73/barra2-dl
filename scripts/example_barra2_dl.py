@@ -1,6 +1,7 @@
 #%% md
 # # barra2-dl point data demo
-# This script uses barra2-dl to download BARRA2 AUS11 files for a list of variables. Individual data files will be
+# This script uses barra2-dl to download BARRA2 AUS11 and AUST04 files for a list of variables. Individual data files
+# will be
 # saved as csv files in a cache folder, then merged into a single pandas dataframe. As a final step the wind ua and va
 # components are converted to v and phi_met, before saving to a new csv file in an output folder.
 #
@@ -12,16 +13,18 @@ from pathlib import Path
 
 import barra2_dl
 from barra2_dl.globals import (
-    BARRA2_AUS11_INDEX,
-    barra2_var_wind_50m,
-    barra2_var_wind_default,
+    BARRA2_INDEX,
+    BARRA2_URL_AUS11_1HR,
+    BARRA2_URL_AUST04_1HR,
+    BARRA2_VAR_WIND_50,
+    BARRA2_VAR_WIND_DEFAULT,
 )
-
 from barra2_dl.mapping import LatLonPoint
+
 #%%
-print('BARRA2_AUS11_INDEX: ' + BARRA2_AUS11_INDEX.__str__())
-print('barra2_var_wind_50m: ' + barra2_var_wind_50m.__str__())
-print('barra2_var_wind_default: ' + barra2_var_wind_default.__str__())
+print('BARRA2_INDEX: ' + BARRA2_INDEX.__str__())
+print('BARRA2_VAR_WIND_50: ' + BARRA2_VAR_WIND_50.__str__())
+print('BARRA2_VAR_WIND_DEFAULT: ' + BARRA2_VAR_WIND_DEFAULT.__str__())
 #%% md
 # ## Set variables
 # Set the cache and output folders.
@@ -48,14 +51,17 @@ end_datetime = datetime.strptime("2023-03-31T23:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
 # use project or location name.
 #
 #%%
-fileout_prefix = "demo"
+fileout_prefix = "barra2_aust04_1hr"
+fileout_prefix = "barra2_aus11_1hr"
+
 #%% md
 # ## Download point data
 # Use point_data_urlfilenames and download_multithread to download the closest node for the desired variables
 # into the target cache folder.
 #%%
 urlfilenames = barra2_dl.download.point_data_urlfilenames(
-    barra2_vars = barra2_var_wind_default,
+    barra2_url = BARRA2_URL_AUS11_1HR, # or barra2_url_aust04_1hr
+    barra2_vars = BARRA2_VAR_WIND_DEFAULT,
     latitude = lat_lon_point.lat,
     longitude = lat_lon_point.lon,
     start_datetime= start_datetime,
@@ -71,7 +77,7 @@ barra2_dl.download.download_multithread(urlfilenames, cache_dir)
 df_merged = barra2_dl.merge.merge_csvs_to_df(
     filein_folder= cache_dir,
     filename_pattern=f'{fileout_prefix}*.csv',
-    index_for_join=BARRA2_AUS11_INDEX,
+    index_for_join=BARRA2_INDEX,
 )
 print(df_merged.head())
 #%%
