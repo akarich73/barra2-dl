@@ -115,8 +115,8 @@ Also refer to the example Jupyter Notebook and script
 
 
 ## Roadmap
-1) Currently, only AUS-11 1hr is implemented. 
-2) Add option for AUS-22 and AUST-04
+1) Currently, AUS-11 and AUST-04 1hr is implemented. 
+2) Add option for AUS-22
 3) Implement bulk download for netCDF (for gridded data) 
 4) Add download progress bar
 5) Multi-location download
