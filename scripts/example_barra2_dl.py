@@ -60,12 +60,8 @@ fileout_prefix = "barra2_aus11_1hr"
 # into the target cache folder.
 #%%
 urlfilenames = barra2_dl.download.point_data_urlfilenames(
-<<<<<<< HEAD
     barra2_url = BARRA2_URL_AUS11_1HR, # or barra2_url_aust04_1hr
     barra2_vars = BARRA2_VAR_WIND_DEFAULT,
-=======
-    barra2_vars = barra2_var_wind_default,
->>>>>>> origin/main
     latitude = lat_lon_point.lat,
     longitude = lat_lon_point.lon,
     start_datetime= start_datetime,
